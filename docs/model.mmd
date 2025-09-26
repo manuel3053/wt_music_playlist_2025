@@ -1,0 +1,98 @@
+---
+    config:
+        layout: elk
+        elk:
+            nodePlacementStrategy: NETWORK_SIMPLEX
+        class:
+            hideEmptyMembersBox: true
+---
+classDiagram
+direction TR
+
+namespace Model {
+  class Playlist
+  class Track
+  class User
+}
+
+namespace DAO {
+  class PlaylistDAO
+  class TrackDAO
+  class UserDAO
+}
+
+class Decodable~T~ {
+  <<interface>>
+  + fromResultSet(ResultSet) T 
+}
+
+class Dao~T~ {
+  - Connection connection
+  + get(String query, DataExtractor prepare) Optional~T~
+  + getList(String query, DataExtractor prepare) List~T~
+  + update(String query, DataExtractor prepare) void
+  + insert(T data, DataExtractor prepare) void
+}
+
+class UserDAO {
+  - Dao~User~ dao
+  + login(String username, String password) boolean
+  + createUser(User user) void
+}
+
+class TrackDAO {
+  - Dao~Track~ dao
+  + createTrack(Track track) void
+  + getTracksByPlaylistTitle(String playlistTitle) List<Track>
+  + getTrackById(int id) void
+  + insertTrackInPlaylist(String playlistTitle, Track track) void
+  + changeTrackPosition(int position, Track track) void
+}
+
+class PlaylistDAO {
+  - Dao~Playlist~ dao
+  + getPlaylistsByUsername(String username) List<Playlist>
+  + getPlaylistByTitle(String title) Playlist
+  + createPlaylist(Playlist playlist) void
+}
+
+class DataExtractor {
+  + setData(PreparedStatement) void
+}
+
+class Playlist {
+  <<record>>
+  - String title
+  - String creationDate
+  - String author
+  - boolean customOrder
+}
+
+class Track {
+  <<record>>
+  - int id
+  - String filePath
+  - String imagePath
+  - String title
+  - String author
+  - String albumTitle
+  - int albumPublicationYear
+  - String genre
+  - int position
+}
+
+class User {
+  <<record>>
+  - String username
+  - String password
+  - String name
+  - String surname
+}
+
+Playlist ..|> Decodable~T~
+Track ..|> Decodable~T~
+User ..|> Decodable~T~
+UserDAO o-- Dao~T~
+TrackDAO o-- Dao~T~
+PlaylistDAO o-- Dao~T~
+Dao~T~ ..> DataExtractor
