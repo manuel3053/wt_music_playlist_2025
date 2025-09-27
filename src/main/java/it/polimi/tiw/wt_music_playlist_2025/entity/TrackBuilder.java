@@ -1,4 +1,4 @@
-package it.polimi.tiw.wt_music_playlist_2025.DAO.entity;
+package it.polimi.tiw.wt_music_playlist_2025.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

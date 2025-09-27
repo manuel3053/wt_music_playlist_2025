@@ -45,13 +45,13 @@ class TrackDAO {
   + createTrack(Track track) void
   + getTracksByPlaylistTitle(String playlistTitle) List<Track>
   + getTrackById(int id) void
-  + insertTrackInPlaylist(String playlistTitle, Track track) void
-  + changeTrackPosition(int position, Track track) void
+  + addTrackToPlaylist(String playlistTitle, Track track) void
+  + moveTrack(int position, Track track) void
 }
 
 class PlaylistDAO {
   - Dao~Playlist~ dao
-  + getPlaylistsByUsername(String username) List<Playlist>
+  + getPlaylistsByAuthor(String author) List<Playlist>
   + getPlaylistByTitle(String title) Playlist
   + createPlaylist(Playlist playlist) void
 }
@@ -62,6 +62,7 @@ class DataExtractor {
 
 class Playlist {
   <<record>>
+  - int id
   - String title
   - String creationDate
   - String author

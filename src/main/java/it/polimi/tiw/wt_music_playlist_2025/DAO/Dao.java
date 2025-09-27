@@ -1,7 +1,7 @@
 package it.polimi.tiw.wt_music_playlist_2025.DAO;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.entity.Entity;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.entity.EntityBuilder;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Entity;
+import it.polimi.tiw.wt_music_playlist_2025.entity.EntityBuilder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,12 +42,12 @@ public class Dao<T extends Entity> {
         return list;
     }
 
-//    public void update(String query, QueryFiller filler) throws SQLException {
-//        PreparedStatement statement = connection.prepareStatement(query);
-//        filler.fill(statement);
-//        ResultSet resultSet = statement.executeQuery();
-//        close(statement, resultSet);
-//    }
+    public void update(String query, QueryFiller filler) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(query);
+        filler.fill(statement);
+        ResultSet resultSet = statement.executeQuery();
+        close(statement, resultSet);
+    }
 
     public void insert(String query, QueryFiller filler) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(query);
