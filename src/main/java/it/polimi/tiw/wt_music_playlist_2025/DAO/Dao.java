@@ -13,30 +13,32 @@ import java.util.Optional;
 
 public class Dao<T extends Entity> {
     private final Connection connection;
+    private final EntityBuilder<T> entityBuilder;
 
-    public Dao(Connection connection) {
+    public Dao(Connection connection, EntityBuilder<T> entityBuilder) {
         this.connection = connection;
+        this.entityBuilder = entityBuilder;
     }
 
-    public Optional<T> get(String query, QueryFiller filler, EntityBuilder<T> builder) throws SQLException {
+    public Optional<T> get(String query, QueryFiller filler) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(query);
         filler.fill(statement);
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()) {
             close(statement, resultSet);
-            return Optional.of(builder.build(resultSet));
+            return Optional.of(entityBuilder.build(resultSet));
         }
         close(statement, resultSet);
         return Optional.empty();
     }
 
-    public List<T> getList(String query, QueryFiller filler, EntityBuilder<T> builder) throws SQLException {
+    public List<T> getList(String query, QueryFiller filler) throws SQLException {
         List<T> list = new ArrayList<>();
         PreparedStatement statement = connection.prepareStatement(query);
         filler.fill(statement);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
-            list.add(builder.build(resultSet));
+            list.add(entityBuilder.build(resultSet));
         }
         close(statement, resultSet);
         return list;

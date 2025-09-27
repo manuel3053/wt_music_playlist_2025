@@ -11,7 +11,7 @@ public class UserDAO {
     private final Dao<User> dao;
 
     public UserDAO(Connection connection) {
-        this.dao = new Dao<>(connection);
+        this.dao = new Dao<>(connection, new UserBuilder());
     }
 
     public Optional<User> login(String username, String password) throws SQLException {
@@ -20,8 +20,7 @@ public class UserDAO {
                 (preparedStatement -> {
                     preparedStatement.setString(0, username);
                     preparedStatement.setString(1, password);
-                }),
-                new UserBuilder()
+                })
         );
     }
 

@@ -10,6 +10,17 @@ CREATE TABLE track (
     position integer
 );
 
+valutare per la data in che formato salvarla
+CREATE TABLE playlist (
+  id integer,
+  title VARCHAR(64) not null,
+  creation_date VARCHAR(64) not null,
+  author VARCHAR(64) not null,
+  custom_order BOOL not null,
+
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE user (
     username VARCHAR(64) not null,
     password VARCHAR(64) not null,

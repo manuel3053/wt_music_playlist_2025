@@ -13,7 +13,7 @@ public class TrackDAO {
     private final Dao<Track> dao;
 
     public TrackDAO(Connection connection) {
-        this.dao = new Dao<>(connection);
+        this.dao = new Dao<>(connection, new TrackBuilder());
     }
 
     public void createTrack(Track track) throws SQLException {
@@ -46,8 +46,7 @@ public class TrackDAO {
         return dao.getList(
                 "",
                 preparedStatement -> {
-                },
-                new TrackBuilder()
+                }
         );
     }
 
@@ -56,8 +55,7 @@ public class TrackDAO {
                 "SELECT * FROM track WHERE id = ?",
                 preparedStatement -> {
                     preparedStatement.setInt(0, id);
-                },
-                new TrackBuilder()
+                }
         );
     }
 

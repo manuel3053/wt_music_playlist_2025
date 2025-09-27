@@ -15,7 +15,7 @@ public class PlaylistDAO {
     private final Dao<Playlist> dao;
 
     public PlaylistDAO(Connection connection) {
-        this.dao = new Dao<>(connection);
+        this.dao = new Dao<>(connection, new PlaylistBuilder());
     }
 
     public List<Playlist> getPlaylistsByAuthor(String author) throws SQLException {
@@ -23,8 +23,7 @@ public class PlaylistDAO {
                 "SELECT * FROM playlist WHERE author = ?",
                 preparedStatement -> {
                     preparedStatement.setString(0, author);
-                },
-                new PlaylistBuilder()
+                }
         );
     }
 
@@ -33,8 +32,7 @@ public class PlaylistDAO {
                 "SELECT * FROM playlist WHERE title = ?",
                 preparedStatement -> {
                     preparedStatement.setString(0, title);
-                },
-                new PlaylistBuilder()
+                }
         );
     }
 
