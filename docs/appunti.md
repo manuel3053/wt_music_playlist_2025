@@ -1,11 +1,12 @@
 FILE PER APPUNTI
 
 DAO
+
 - Contiene la classe Connection
 - Tutti i metodi CRUD che potrebbero essere applicati all'oggetto
 - Dopo ogni operazione chiude la connessione
 - Dato che solo l'utente stesso può modificare i suoi dati, allora è come il videogioco
 - Praticamente è una variante del Repository pattern
 - Forse il DAO è il service
-- Il caching va fatto dento le classi wrapper di Dao<T> (es. TrackDAO)
+- Il caching va fatto dentro le classi wrapper di Dao<T> (es. TrackDAO)
 - anzi, eviterei il caching
