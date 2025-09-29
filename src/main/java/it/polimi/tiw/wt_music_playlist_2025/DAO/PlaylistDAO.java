@@ -1,12 +1,10 @@
 package it.polimi.tiw.wt_music_playlist_2025.DAO;
 
-import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
-import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistBuilder;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.entity.TrackBuilder;
+import it.polimi.tiw.wt_music_playlist_2025.entity.*;
 import org.jboss.jdeparser.FormatPreferences;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,12 @@ public class PlaylistDAO {
     private final Dao<Playlist> dao;
 
     public PlaylistDAO(Connection connection) {
-        this.dao = new Dao<>(connection, new PlaylistBuilder());
+        this.dao = new Dao<>(connection, resultSet -> {
+            new Playlist(
+
+            );
+        });
+//        this.dao = new Dao<>(connection, new PlaylistBuilder());
     }
 
     public List<Playlist> getPlaylistsByAuthor(String author) throws SQLException {
