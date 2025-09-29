@@ -13,11 +13,13 @@ public class PlaylistDAO {
     private final Dao<Playlist> dao;
 
     public PlaylistDAO(Connection connection) {
-        this.dao = new Dao<>(connection, resultSet -> {
-            new Playlist(
-
-            );
-        });
+        this.dao = new Dao<>(connection, resultSet -> new Playlist(
+                resultSet.getInt("id"),
+                resultSet.getString("title"),
+                resultSet.getString("creation_date"),
+                resultSet.getString("author"),
+                resultSet.getBoolean("custom_order")
+        ));
 //        this.dao = new Dao<>(connection, new PlaylistBuilder());
     }
 

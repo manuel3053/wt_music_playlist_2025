@@ -1,10 +1,11 @@
 package it.polimi.tiw.wt_music_playlist_2025.DAO;
 
+import it.polimi.tiw.wt_music_playlist_2025.entity.EntityBuilder;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.entity.TrackBuilder;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,17 @@ public class TrackDAO {
     private final Dao<Track> dao;
 
     public TrackDAO(Connection connection) {
-        this.dao = new Dao<>(connection, new TrackBuilder());
+        this.dao = new Dao<>(connection, resultSet -> new Track(
+                resultSet.getInt("id"),
+                resultSet.getString("file_path"),
+                resultSet.getString("image_path"),
+                resultSet.getString("title"),
+                resultSet.getString("author"),
+                resultSet.getString("album_title"),
+                resultSet.getInt("album_publication_year"),
+                resultSet.getString("genre"),
+                resultSet.getInt("position")
+        ));
     }
 
     public void createTrack(Track track) throws SQLException {
