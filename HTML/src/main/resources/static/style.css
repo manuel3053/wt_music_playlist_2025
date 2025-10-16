@@ -1,0 +1,69 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.home {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    height: fit-content;
+    width: fit-content;
+    margin: 0;
+    padding: 0;
+}
+
+.form-field {
+    display: flex;
+}
+
+.form-tracks-list {
+    grid-column: span 2;
+    width: 100%;
+}
+
+.form-button {
+    display: flex;
+    grid-column: span 2;
+}
+
+.playlist-list {
+    height: 100%;
+    grid-row: span 2;
+    display: flex;
+    background: blue;
+    align-items: center;
+    justify-content: center;
+}
+
+.load-track {
+    height: 100%;
+    display: flex;
+    background: grey;
+    align-items: center;
+    justify-content: center;
+}
+
+.load-playlist {
+    height: 100%;
+    display: flex;
+    background: orange;
+    align-items: center;
+    justify-content: center;
+}

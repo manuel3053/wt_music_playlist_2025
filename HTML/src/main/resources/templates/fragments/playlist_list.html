@@ -1,0 +1,13 @@
+<div th:fragment="playlist_list" class="playlist-list">
+<!--    <h1>Playlists</h1>-->
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Author ID</th>
+        </tr>
+        <tr th:each="playlist : ${playlists}">
+            <td><span th:text="${playlist.title}"> Title </span></td>
+            <td><span th:text="${playlist.authorId}"> Author </span></td>
+        </tr>
+    </table>
+</div>

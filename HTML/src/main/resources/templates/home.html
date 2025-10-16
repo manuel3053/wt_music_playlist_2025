@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+    <title>Home</title>
+</head>
+<body>
+    <div class = "home">
+        <div th:replace="~{fragments/playlist_list.html :: playlist_list}"></div>
+        <div th:replace="~{fragments/load_track.html :: load_track}"></div>
+        <div th:replace="~{fragments/load_playlist.html :: load_playlist}"></div>
+    </div>
+</body>
+</html>
