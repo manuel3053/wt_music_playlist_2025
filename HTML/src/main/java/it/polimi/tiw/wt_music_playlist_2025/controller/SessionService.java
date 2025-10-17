@@ -10,23 +10,35 @@ public class SessionService {
 
     private SessionService() {}
 
-    static int getSelectedPlaylistId(HttpSession session) {
-        return (int) session.getAttribute(playlistIdKey);
+    static Integer getSelectedPlaylistId(HttpSession session) throws MissingSessionAttribute {
+        Integer id = (Integer) session.getAttribute(playlistIdKey);
+        if (id == null) {
+            throw new MissingSessionAttribute("Missing playlist id");
+        }
+        return id;
     }
 
-    static int getSelectedTrackId(HttpSession session) {
-        return (int) session.getAttribute(trackIdKey);
+    static Integer getSelectedTrackId(HttpSession session) throws MissingSessionAttribute {
+        Integer id = (Integer) session.getAttribute(trackIdKey);
+        if (id == null) {
+            throw new MissingSessionAttribute("Missing playlist id");
+        }
+        return id;
     }
 
-    static User getUser(HttpSession session) {
-        return (User) session.getAttribute(userKey);
+    static User getUser(HttpSession session) throws  MissingSessionAttribute {
+        User user = (User) session.getAttribute(userKey);
+        if (user == null) {
+            throw new MissingSessionAttribute("Missing user attribute");
+        }
+        return user;
     }
 
-    static void setSelectedPlaylistId(HttpSession session, int id) {
+    static void setSelectedPlaylistId(HttpSession session, Integer id) {
         session.setAttribute(playlistIdKey, id);
     }
 
-    static void setSelectedTrackId(HttpSession session, int id) {
+    static void setSelectedTrackId(HttpSession session, Integer id) {
         session.setAttribute(trackIdKey, id);
     }
 

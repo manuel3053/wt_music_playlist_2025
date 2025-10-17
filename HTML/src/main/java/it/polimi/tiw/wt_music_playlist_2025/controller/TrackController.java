@@ -22,8 +22,12 @@ public class TrackController {
 
     @GetMapping("/view")
     public String showPage(Model model, HttpSession session) {
-        model.addAttribute("track", trackDAO.findTrackById(SessionService.getSelectedTrackId(session)));
-        return "track";
+        try {
+            model.addAttribute("track", trackDAO.findTrackById(SessionService.getSelectedTrackId(session)));
+        } catch (MissingSessionAttribute e) {
+            return SitePath.PLAYLIST.go();
+        }
+        return SitePath.TRACK.show();
     }
 
 }

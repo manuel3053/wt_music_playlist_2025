@@ -30,29 +30,37 @@ public class PlaylistController {
 
     @GetMapping("/view")
     public String showPage(Model model, HttpSession session) {
-        model.addAttribute("tracks", trackDAO.getAllByPlaylistId(SessionService.getSelectedPlaylistId(session)));
+        try {
+            model.addAttribute("tracks", trackDAO.getAllByPlaylistId(SessionService.getSelectedPlaylistId(session)));
+        } catch (MissingSessionAttribute e) {
+            return SitePath.HOME.go();
+        }
         // vedere se abbia senso fare l'operazione con il db o qui in locale (togliere le tracce già nella playlist)
 //        model.addAttribute("notAddedTracks", trackDAO.getAllByPlaylistId(selectedPlaylistId));
-        return "playlist";
+        return SitePath.PLAYLIST.show();
     }
 
     @PostMapping("/add_track_to_playlist")
     public String addPlaylist(PlaylistForm playlistForm, HttpSession session) {
-        playlistForm.toPlaylistTracks(SessionService.getSelectedPlaylistId(session)).forEach(playlistTracksDAO::save);
-        return "redirect:view_playlist";
+        try {
+            playlistForm.toPlaylistTracks(SessionService.getSelectedPlaylistId(session)).forEach(playlistTracksDAO::save);
+        } catch (MissingSessionAttribute e) {
+            return SitePath.HOME.go();
+        }
+        return SitePath.PLAYLIST.reload();
     }
 
     @PostMapping("/scroll_playlist")
     public String scrollPlaylist() {
         // se l'elenco dei brani è già presente in locale non serve il redirect
         // altrimenti basta tenerlo e aggiornare la lista di brani visibili
-        return "redirect:view_playlist";
+        return SitePath.PLAYLIST.reload();
     }
 
     @GetMapping("/select_track")
     public String selectTrack(HttpSession session, int selectedTrackId) {
         SessionService.setSelectedTrackId(session, selectedTrackId);
-        return "forward:view_track";
+        return SitePath.TRACK.go();
     }
 
 }

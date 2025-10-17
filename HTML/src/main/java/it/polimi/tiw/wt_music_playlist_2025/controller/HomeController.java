@@ -37,41 +37,42 @@ public class HomeController {
     private final PlaylistDAO playlistDAO;
     private final TrackDAO trackDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
+    private int userId;
 
     @GetMapping("/view")
     public String showPage(Model model, HttpSession session) {
-        // L'utente andrà recuperato dalla sessione, quindi dopo il login andra innanzitutto
-        // salvato nella sessione
-        model.addAttribute("playlists", playlistDAO.findByAuthorId(1));
+        try {
+            userId = SessionService.getUser(session).getId();
+        } catch (MissingSessionAttribute e) {
+            return SitePath.LOGIN.go();
+        }
+        System.out.println("userId = " + userId);
+        model.addAttribute("playlists", playlistDAO.findByAuthorId(userId));
         model.addAttribute("trackForm", new TrackForm());
         model.addAttribute("playlistForm", new PlaylistForm());
-        tracks = trackDAO.getAllByLoaderId(1);
+        tracks = trackDAO.getAllByLoaderId(userId);
         model.addAttribute("tracks", tracks);
-        // Crea tabella per i generi, non ha senso siano solo builtin nel programma
         model.addAttribute("genres", Genre.values());
-        return "home";
+        return SitePath.HOME.show();
     }
 
     @PostMapping("/add_track")
     public String addTrack(TrackForm trackForm) {
-        trackDAO.save(trackForm.toTrack(mediaPath, 1));
-        return "redirect:view_home";
+        trackDAO.save(trackForm.toTrack(mediaPath, userId));
+        return SitePath.HOME.reload();
     }
 
     @PostMapping("/add_playlist")
     public String addPlaylist(PlaylistForm playlistForm) {
-        Playlist insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(1, tracks));
-//        System.out.println(insertedPlaylist.getId() + " " + insertedPlaylist.getAuthorId() + " " + insertedPlaylist.getTitle() + " ");
-//
-//        playlistForm.getSelectedTracks().forEach(trackId -> System.out.println(insertedPlaylist.getId() + " " + trackId));
+        Playlist insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
         playlistForm.toPlaylistTracks(insertedPlaylist.getId()).forEach(playlistTracksDAO::save);
-        return "redirect:view_home";
+        return SitePath.HOME.reload();
     }
 
     @GetMapping("/select_playlist")
     public String selectPlaylist(HttpSession session, int selectedPlaylistId) {
         SessionService.setSelectedPlaylistId(session, selectedPlaylistId);
-        return "forward:view_playlist";
+        return SitePath.PLAYLIST.go();
     }
 
 }

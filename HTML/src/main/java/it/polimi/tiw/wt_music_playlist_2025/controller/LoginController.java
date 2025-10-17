@@ -23,26 +23,18 @@ public class LoginController {
     @GetMapping("/view")
     public String showPage(Model model) {
         model.addAttribute("userForm", new UserForm());
-        return "login";
+        return SitePath.LOGIN.show();
     }
 
     @PostMapping("/login")
     public String login(UserForm userForm, HttpSession session) {
         User user = userDAO.findUserByUsernameAndPassword(userForm.getUsername(), userForm.getPassword());
         if (user == null) {
-            return "redirect:view_login";
+            return SitePath.LOGIN.reload();
         } else {
             SessionService.setUser(session, user);
-            return "redirect:/home/view";
+            return SitePath.HOME.go();
         }
     }
-
-    @PostMapping("/subscribe")
-    public String subscribe(UserForm userForm, HttpSession session) {
-        User user = userDAO.save(userForm.toUser());
-        SessionService.setUser(session, user);
-        return "redirect:/home/view";
-    }
-
 
 }
