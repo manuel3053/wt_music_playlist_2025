@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/subscribe")
+public class SubscribeController {
 
-    public LoginController(UserDAO userDAO) {
+    public SubscribeController(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
@@ -23,18 +23,7 @@ public class LoginController {
     @GetMapping("/view")
     public String showPage(Model model) {
         model.addAttribute("userForm", new UserForm());
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(UserForm userForm, HttpSession session) {
-        User user = userDAO.findUserByUsernameAndPassword(userForm.getUsername(), userForm.getPassword());
-        if (user == null) {
-            return "redirect:view_login";
-        } else {
-            SessionService.setUser(session, user);
-            return "redirect:/home/view";
-        }
+        return "subscribe";
     }
 
     @PostMapping("/subscribe")

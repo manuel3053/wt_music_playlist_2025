@@ -1,21 +1,21 @@
 <div th:fragment="load_track" class="load-track">
     <form th:action="@{/home/add_track}" method="post" th:object="${trackForm}" class="form">
-        <label class="form-field">Title</label>
+        <label class="form-field-name">Title</label>
         <input class="form-field" type="text" th:field="*{title}" placeholder="Title" required>
-        <label class="form-field">File path</label>
-        <input class="form-field" type="file" accept="audio/*" th:field="*{file}" placeholder="File Path" required>
-        <label class="form-field">Image path</label>
-        <input class="form-field" type="file" accept="image/*" th:field="*{image}" placeholder="Image Path" required>
-        <label class="form-field">Author</label>
+        <label class="form-field-name">File path</label>
+        <input class="form-field-file" type="file" accept="audio/*" th:field="*{file}" placeholder="File Path" required>
+        <label class="form-field-name">Image path</label>
+        <input class="form-field-file" type="file" accept="image/*" th:field="*{image}" placeholder="Image Path" required>
+        <label class="form-field-name">Author</label>
         <input class="form-field" type="text" th:field="*{author}" placeholder="Author" required>
-        <label class="form-field">Album title</label>
+        <label class="form-field-name">Album title</label>
         <input class="form-field" type="text" th:field="*{albumTitle}" placeholder="Album Title" required>
-        <label class="form-field">Album publication year</label>
+        <label class="form-field-name">Album publication year</label>
         <select class="form-field" th:field="*{albumPublicationYear}">
             <option th:each="i : ${#numbers.sequence(1900,2026)}" th:value="${i}" th:text="${i}"></option>
         </select>
 <!--        <input class="form-field" type="number" th:field="*{albumPublicationYear}" required>-->
-        <label class="form-field">Genre</label>
+        <label class="form-field-name">Genre</label>
         <select class="form-field" th:field="*{genre}">
             <option th:each="genre : ${genres}" th:value="${genre}" th:text="${genre}"></option>
         </select>

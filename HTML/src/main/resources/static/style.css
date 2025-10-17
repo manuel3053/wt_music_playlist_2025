@@ -1,22 +1,39 @@
+:root {
+    --padding: 0.5em;
+    --margin: 0.5em;
+    --border-radius: 5px;
+}
+
+@font-face {
+    font-family: "SpaceMono";
+    src: url("./fonts/SpaceMono-Regular.ttf");
+}
+
 html,
 body {
     margin: 0;
     padding: 0;
+    background-color: black;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
+* {
+    font-family: SpaceMono;
+    font-size: 16px;
+    color: white;
 }
 
-.home {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
+input[type=file]::file-selector-button {
+    font-family: SpaceMono;
+    margin-right: 1em;
+    border: none;
+    background: yellow;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+input[type=file]::file-selector-button:hover {
+    background-color: orange;
 }
 
 .form {
@@ -29,8 +46,27 @@ body {
     padding: 0;
 }
 
-.form-field {
+.form-field, .form-field-name, .form-field-file {
     display: flex;
+    padding: var(--padding);
+    margin: var(--margin);
+}
+
+.form-field-file {
+    background-color: transparent;
+}
+
+.form-field {
+    border-radius: var(--border-radius);
+    color: black;
+    background-color: #FFFF99;
+    border: none;
+}
+
+.subscribe-link {
+    color: yellow;
+    padding: var(--padding);
+    cursor: pointer;
 }
 
 .form-tracks-list {
@@ -41,29 +77,19 @@ body {
 .form-button {
     display: flex;
     grid-column: span 2;
+    background-color: yellow;
+    color: black;
+    text-align: center;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    padding: var(--padding);
+    margin: var(--margin);
 }
 
-.playlist-list {
-    height: 100%;
-    grid-row: span 2;
+.form-button:hover {
     display: flex;
-    background: blue;
-    align-items: center;
-    justify-content: center;
-}
-
-.load-track {
-    height: 100%;
-    display: flex;
-    background: grey;
-    align-items: center;
-    justify-content: center;
-}
-
-.load-playlist {
-    height: 100%;
-    display: flex;
-    background: orange;
-    align-items: center;
-    justify-content: center;
+    grid-column: span 2;
+    background-color: orange;
+    border: none;
 }

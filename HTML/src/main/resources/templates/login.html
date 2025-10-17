@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/login.css}" />
     <title>Login</title>
 </head>
 <body>
     <div class = "login">
-        <h1>Login</h1>
-        <form th:action="@{/login/login}" method="post" th:object="${loginForm}" class="form">
-            <label class="form-field">Username</label>
-            <input class="form-field" type="text" th:field="*{username}" placeholder="Username" required>
-            <label class="form-field">Password</label>
+        <form th:action="@{/login/login}" method="post" th:object="${userForm}" class="form">
+            <label class="form-field-name">Name</label>
+            <input class="form-field" type="text" th:field="*{username}" placeholder="Surname" required>
+            <label class="form-field-name">Password</label>
             <input class="form-field" type="text" th:field="*{password}" placeholder="Password" required>
-            <input class="form-button" type="submit"/>
+            <input class="form-button" type="submit" value="Login"/>
+            <a class="subscribe-link" th:href="@{/subscribe/view}">Not subscribed?</a>
         </form>
     </div>
 </body>
