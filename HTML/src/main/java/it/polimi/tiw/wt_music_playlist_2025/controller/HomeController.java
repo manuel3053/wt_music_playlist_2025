@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -44,35 +44,29 @@ public class HomeController {
         try {
             userId = SessionService.getUser(session).getId();
         } catch (MissingSessionAttribute e) {
-            return SitePath.LOGIN.go();
+            return Route.LOGIN.go();
         }
-        System.out.println("userId = " + userId);
         model.addAttribute("playlists", playlistDAO.findByAuthorId(userId));
         model.addAttribute("trackForm", new TrackForm());
         model.addAttribute("playlistForm", new PlaylistForm());
         tracks = trackDAO.getAllByLoaderId(userId);
         model.addAttribute("tracks", tracks);
         model.addAttribute("genres", Genre.values());
-        return SitePath.HOME.show();
+        model.addAttribute("userId", userId);
+        return Route.HOME.show();
     }
 
     @PostMapping("/add_track")
     public String addTrack(TrackForm trackForm) {
         trackDAO.save(trackForm.toTrack(mediaPath, userId));
-        return SitePath.HOME.reload();
+        return Route.HOME.reload();
     }
 
     @PostMapping("/add_playlist")
     public String addPlaylist(PlaylistForm playlistForm) {
         Playlist insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
         playlistForm.toPlaylistTracks(insertedPlaylist.getId()).forEach(playlistTracksDAO::save);
-        return SitePath.HOME.reload();
-    }
-
-    @GetMapping("/select_playlist")
-    public String selectPlaylist(HttpSession session, int selectedPlaylistId) {
-        SessionService.setSelectedPlaylistId(session, selectedPlaylistId);
-        return SitePath.PLAYLIST.go();
+        return Route.HOME.reload();
     }
 
 }

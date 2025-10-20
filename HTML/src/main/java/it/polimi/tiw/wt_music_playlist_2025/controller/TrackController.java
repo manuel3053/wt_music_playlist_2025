@@ -1,9 +1,6 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,9 +22,9 @@ public class TrackController {
         try {
             model.addAttribute("track", trackDAO.findTrackById(SessionService.getSelectedTrackId(session)));
         } catch (MissingSessionAttribute e) {
-            return SitePath.PLAYLIST.go();
+            return Route.PLAYLIST.go();
         }
-        return SitePath.TRACK.show();
+        return Route.TRACK.show();
     }
 
 }

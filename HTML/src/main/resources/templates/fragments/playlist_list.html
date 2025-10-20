@@ -1,13 +1,15 @@
 <div th:fragment="playlist_list" class="playlist-list">
 <!--    <h1>Playlists</h1>-->
+    <form>
     <table>
         <tr>
             <th>Title</th>
-            <th>Author ID</th>
+            <th>Creation date</th>
         </tr>
         <tr th:each="playlist : ${playlists}">
-            <td><span th:text="${playlist.title}"> Title </span></td>
-            <td><span th:text="${playlist.authorId}"> Author </span></td>
+            <td><a class="link-button" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlist.id}}" th:text="${playlist.title}" th:object="${userId}"></a></td>
+            <td><span th:text="${playlist.creationDate}"></span></td>
         </tr>
     </table>
+    </form>
 </div>

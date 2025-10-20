@@ -33,7 +33,7 @@ CREATE TABLE playlist
 (
     id            integer AUTO_INCREMENT,
     title         VARCHAR(64) not null,
-    creation_date DATETIME DEFAULT NOW(),
+    creation_date DATETIME not null DEFAULT NOW(),
     author_id     integer not null,
     custom_order  BOOL        not null,
 

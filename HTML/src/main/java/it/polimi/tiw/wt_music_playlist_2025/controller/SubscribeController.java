@@ -23,14 +23,14 @@ public class SubscribeController {
     @GetMapping("/view")
     public String showPage(Model model) {
         model.addAttribute("userForm", new UserForm());
-        return SitePath.SUBSCRIBE.show();
+        return Route.SUBSCRIBE.show();
     }
 
     @PostMapping("/subscribe")
     public String subscribe(UserForm userForm, HttpSession session) {
         User user = userDAO.save(userForm.toUser());
         SessionService.setUser(session, user);
-        return SitePath.HOME.go();
+        return Route.HOME.go();
     }
 
 

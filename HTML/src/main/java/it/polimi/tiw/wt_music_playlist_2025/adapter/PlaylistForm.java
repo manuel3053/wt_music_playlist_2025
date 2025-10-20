@@ -5,6 +5,7 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class PlaylistForm {
         playlist.setTitle(title);
         playlist.setAuthorId(authorId);
         playlist.setCustomOrder(false);
+        playlist.setCreationDate(new Date(System.currentTimeMillis()));
         return playlist;
     }
 

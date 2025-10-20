@@ -40,6 +40,10 @@ option {
     color: black;
 }
 
+option:hover {
+    background-color: orange;
+}
+
 .form {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -78,7 +82,7 @@ option {
     width: 100%;
 }
 
-.form-button {
+.form-button, button, .link-button {
     display: flex;
     grid-column: span 2;
     background-color: yellow;
@@ -91,9 +95,14 @@ option {
     margin: var(--margin);
 }
 
-.form-button:hover {
+.form-button:hover, button:hover, .link-button:hover {
     display: flex;
     grid-column: span 2;
     background-color: orange;
     border: none;
+}
+
+.link-button {
+    text-decoration: none;
+    text-align: center;
 }

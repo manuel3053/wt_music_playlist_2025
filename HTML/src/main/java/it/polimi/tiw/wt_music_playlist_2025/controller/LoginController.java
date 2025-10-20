@@ -23,17 +23,17 @@ public class LoginController {
     @GetMapping("/view")
     public String showPage(Model model) {
         model.addAttribute("userForm", new UserForm());
-        return SitePath.LOGIN.show();
+        return Route.LOGIN.show();
     }
 
     @PostMapping("/login")
     public String login(UserForm userForm, HttpSession session) {
         User user = userDAO.findUserByUsernameAndPassword(userForm.getUsername(), userForm.getPassword());
         if (user == null) {
-            return SitePath.LOGIN.reload();
+            return Route.LOGIN.reload();
         } else {
             SessionService.setUser(session, user);
-            return SitePath.HOME.go();
+            return Route.HOME.go();
         }
     }
 
