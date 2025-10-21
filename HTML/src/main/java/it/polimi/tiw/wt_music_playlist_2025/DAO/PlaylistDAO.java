@@ -12,6 +12,7 @@ import java.util.Map;
 @Repository
 public interface PlaylistDAO extends JpaRepository<Playlist, Integer> {
     List<Playlist> findByAuthorId(int authorId);
+    List<Playlist> findByAuthorIdOrderByCreationDateAsc(int authorId);
     Playlist findByTitle(String title);
     Playlist save(Playlist playlist);
     @NativeQuery(

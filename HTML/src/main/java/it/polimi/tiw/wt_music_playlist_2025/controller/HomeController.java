@@ -46,7 +46,7 @@ public class HomeController {
         } catch (MissingSessionAttribute e) {
             return Route.LOGIN.go();
         }
-        model.addAttribute("playlists", playlistDAO.findByAuthorId(userId));
+        model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
         model.addAttribute("trackForm", new TrackForm());
         model.addAttribute("playlistForm", new PlaylistForm());
         tracks = trackDAO.getAllByLoaderId(userId);
