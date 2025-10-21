@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/track.css}" />
     <title>Track</title>
 </head>
 <body>
     <div class = "track">
-        <h1>Track</h1>
+        <div class="track-content">
+            <div class="album-cover">ciao?</div>
+            <div class="attribute-name">Title:</div>
+            <div class="attribute" th:text="${track.title}"></div>
+            <div class="attribute-name">Author:</div>
+            <div class="attribute" th:text="${track.author}"></div>
+            <div class="attribute-name">Album title:</div>
+            <div class="attribute" th:text="${track.albumTitle}"></div>
+            <div class="attribute-name">Publication year:</div>
+            <div class="attribute" th:text="${track.albumPublicationYear}"></div>
+            <div class="attribute-name">Genre: </div>
+            <div class="attribute" th:text="${track.genre}"></div>
+        </div>
     </div>
 </body>
 </html>

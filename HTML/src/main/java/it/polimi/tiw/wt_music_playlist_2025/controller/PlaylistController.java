@@ -25,11 +25,19 @@ public class PlaylistController {
         this.playlistTracksDAO = playlistTracksDAO;
     }
 
-//    @GetMapping("/view/{id}")
-    @GetMapping("/view/{user_id}/{playlist_id}")
-    public String showPage(Model model, HttpSession session, @PathVariable("playlist_id") String playlistId) {
-        System.out.println(playlistId);
-//            model.addAttribute("tracks", trackDAO.getAllByPlaylistId(Integer.parseInt(playlistId)));
+    @GetMapping("/view/{user_id}/{playlist_id}/{group}")
+    public String showPage(Model model, HttpSession session, @PathVariable("user_id") int userId, @PathVariable("playlist_id") int playlistId, @PathVariable("group") int offset) {
+        try {
+            if (!SessionService.checkValidAccess(session, userId)) {
+                return Route.LOGIN.go();
+            }
+        } catch (MissingSessionAttribute e) {
+            return Route.LOGIN.go();
+        }
+        model.addAttribute("tracks", trackDAO.getPlaylistTracksGroup(playlistId, offset * 5));
+        model.addAttribute("userId", userId);
+        model.addAttribute("playlistId", playlistId);
+        model.addAttribute("offset", offset);
         // vedere se abbia senso fare l'operazione con il db o qui in locale (togliere le tracce già nella playlist)
 //        model.addAttribute("notAddedTracks", trackDAO.getAllByPlaylistId(selectedPlaylistId));
         return Route.PLAYLIST.show();
@@ -42,13 +50,6 @@ public class PlaylistController {
         } catch (MissingSessionAttribute e) {
             return Route.HOME.go();
         }
-        return Route.PLAYLIST.reload();
-    }
-
-    @PostMapping("/scroll_playlist")
-    public String scrollPlaylist() {
-        // se l'elenco dei brani è già presente in locale non serve il redirect
-        // altrimenti basta tenerlo e aggiornare la lista di brani visibili
         return Route.PLAYLIST.reload();
     }
 

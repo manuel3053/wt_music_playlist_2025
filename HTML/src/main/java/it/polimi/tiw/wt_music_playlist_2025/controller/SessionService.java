@@ -2,6 +2,7 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 
 import it.polimi.tiw.wt_music_playlist_2025.entity.User;
 import jakarta.servlet.http.HttpSession;
+import org.jboss.weld.context.http.Http;
 
 public class SessionService {
     static private String playlistIdKey = "PLAYLIST_ID";
@@ -9,6 +10,13 @@ public class SessionService {
     static private String userKey = "USER_KEY";
 
     private SessionService() {}
+
+    static boolean checkValidAccess(HttpSession session, int userId) throws MissingSessionAttribute {
+        if (userId != getUser(session).getId()) {
+            return false;
+        }
+        return true;
+    }
 
     static Integer getSelectedPlaylistId(HttpSession session) throws MissingSessionAttribute {
         Integer id = (Integer) session.getAttribute(playlistIdKey);
