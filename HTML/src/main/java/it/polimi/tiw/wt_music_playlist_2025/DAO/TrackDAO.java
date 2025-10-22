@@ -15,6 +15,13 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
     List<Track> getAllByLoaderId(int loaderId);
     @NativeQuery(
             value = "select t.* " +
+                    "from track t join user u on t.loader_id = u.id " +
+                    "where u.id = ?1 " +
+                    "order by t.author asc, t.album_publication_year asc, t.id asc"
+    )
+    List<Track> getAllByUserIdSorted(int userId);
+    @NativeQuery(
+            value = "select t.* " +
                     "from track t join playlist_tracks pt on t.id = pt.track_id " +
                     "where pt.playlist_id = ?1 " +
                     "order by t.author asc, t.album_publication_year asc, t.id asc " +
@@ -22,85 +29,17 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
                     "fetch next 5 rows only"
     )
     List<Track> getPlaylistTracksGroup(int playlistId, int offset);
-//    private final Dao<Track> dao;
-//
-//    public TrackDAO(Connection connection) {
-//        this.dao = new Dao<>(connection, resultSet -> new Track(
-//                resultSet.getInt("id"),
-//                resultSet.getString("file_path"),
-//                resultSet.getString("image_path"),
-//                resultSet.getString("title"),
-//                resultSet.getString("author"),
-//                resultSet.getString("album_title"),
-//                resultSet.getInt("album_publication_year"),
-//                resultSet.getString("genre"),
-//                resultSet.getInt("position")
-//        ));
-//    }
-//
-//    public void createTrack(Track track) throws SQLException {
-//        dao.insert(
-//                "INSERT INTO track (" +
-//                        "file_path, " +
-//                        "image_path, " +
-//                        "title, " +
-//                        "author, " +
-//                        "album_title, " +
-//                        "album_publication_year, " +
-//                        "genre, " +
-//                        "position) " +
-//                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-//                preparedStatement -> {
-//                    preparedStatement.setString(0, track.filePath());
-//                    preparedStatement.setString(1, track.imagePath());
-//                    preparedStatement.setString(2, track.title());
-//                    preparedStatement.setString(3, track.author());
-//                    preparedStatement.setString(4, track.albumTitle());
-//                    preparedStatement.setInt(5, track.albumPublicationYear());
-//                    preparedStatement.setString(6, track.genre());
-//                    // verificare se non dia problemi quando null
-//                    preparedStatement.setInt(7, track.position());
-//                }
-//        );
-//    }
-//
-//    public List<Track> getTracksByPlaylistTitle(String title) throws SQLException {
-//        return dao.getList(
-//                "",
-//                preparedStatement -> {
-//                }
-//        );
-//    }
-//
-//    public Optional<Track> getTrackById(int id) throws SQLException {
-//        return dao.get(
-//                "SELECT * FROM track WHERE id = ?",
-//                preparedStatement -> {
-//                    preparedStatement.setInt(0, id);
-//                }
-//        );
-//    }
-//
-//    public void addTrackToPlaylist(Playlist playlist, Track track) throws SQLException {
-//        dao.insert(
-//                "INSERT INTO playlist_tracks(playlist_id, track_id)" +
-//                        "VALUES(?, ?,)",
-//                preparedStatement -> {
-//                    preparedStatement.setInt(0, playlist.id());
-//                    preparedStatement.setInt(1, track.id());
-//                }
-//        );
-//    }
-//
-//    public void moveTrack(int position, Track track) throws SQLException {
-//        dao.update(
-//                "",
-//                preparedStatement -> {
-//                    preparedStatement.setInt(0, position);
-//                    preparedStatement.setInt(1, track.id());
-//                }
-//        );
-//    }
-//
-//
+    @NativeQuery(
+            value = "select * " +
+                    "from track " +
+                    "where id not in " +
+                    "(" +
+                    "select t.id " +
+                    "from track t join playlist_tracks pt on t.id = pt.track_id " +
+                    "where pt.playlist_id = ?1 " +
+                    ") " +
+                    "order by author asc, album_publication_year asc, id asc"
+    )
+    List<Track> getAllNotInPlaylist(int playlistId);
+
 }

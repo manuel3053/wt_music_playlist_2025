@@ -21,7 +21,23 @@
                 </td>
             </tr>
         </table>
-        <div>ciao</div>
+        <form th:if="${#lists.size(tracksNotInPlaylist) != 0}" th:action="@{/playlist/add_track_to_playlist}" method="post" th:object="${playlistForm}" class="form">
+            <table class="form-tracks-list">
+                <tr>
+                    <th></th>
+                    <th>Track title</th>
+                    <th>Track album</th>
+                </tr>
+                <tr th:each="track : ${tracksNotInPlaylist}">
+                    <td><input type="checkbox"
+                               th:field="*{selectedTracks}" th:value="${track.id}"></td>
+                    </td>
+                    <td><span th:text="${track.title}"> Title </span></td>
+                    <td><span th:text="${track.albumTitle}"> Author </span></td>
+                </tr>
+            </table>
+            <input class="form-button" type="submit"/>
+        </form>
     </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package it.polimi.tiw.wt_music_playlist_2025.adapter;
+package it.polimi.tiw.wt_music_playlist_2025.form;
 
 import it.polimi.tiw.wt_music_playlist_2025.entity.User;
 

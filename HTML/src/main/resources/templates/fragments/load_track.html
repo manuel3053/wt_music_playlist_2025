@@ -1,11 +1,11 @@
 <div th:fragment="load_track" class="load-track">
-    <form th:action="@{/home/add_track}" method="post" th:object="${trackForm}" class="form">
+    <form th:action="@{/home/add_track}" method="post" enctype="multipart/form-data" th:object="${trackForm}" class="form">
         <label class="form-field-name">Title</label>
         <input class="form-field" type="text" th:field="*{title}" placeholder="Title" required>
         <label class="form-field-name">File path</label>
-        <input class="form-field-file" type="file" accept="audio/*" th:field="*{file}" placeholder="File Path" required>
+        <input class="form-field-file" name="audio" type="file" accept="audio/*" th:field="*{file}" placeholder="File Path" required>
         <label class="form-field-name">Image path</label>
-        <input class="form-field-file" type="file" accept="image/*" th:field="*{image}" placeholder="Image Path" required>
+        <input class="form-field-file" name="image" type="file" accept="image/*" th:field="*{image}" placeholder="Image Path" required>
         <label class="form-field-name">Author</label>
         <input class="form-field" type="text" th:field="*{author}" placeholder="Author" required>
         <label class="form-field-name">Album title</label>

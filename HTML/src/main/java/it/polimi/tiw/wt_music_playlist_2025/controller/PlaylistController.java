@@ -3,7 +3,7 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.adapter.PlaylistForm;
+import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +18,8 @@ public class PlaylistController {
     private final PlaylistDAO playlistDAO;
     private final TrackDAO trackDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
+    private int playlistId;
+    private int userId;
 
     public PlaylistController(PlaylistDAO playlistDAO, TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO) {
         this.playlistDAO = playlistDAO;
@@ -34,10 +36,15 @@ public class PlaylistController {
         } catch (MissingSessionAttribute e) {
             return Route.LOGIN.go();
         }
+        this.userId = playlistId;
+        this.playlistId = playlistId;
         model.addAttribute("tracks", trackDAO.getPlaylistTracksGroup(playlistId, offset * 5));
+        model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(playlistId));
         model.addAttribute("userId", userId);
         model.addAttribute("playlistId", playlistId);
         model.addAttribute("offset", offset);
+        model.addAttribute("playlistForm", new PlaylistForm());
+
         // vedere se abbia senso fare l'operazione con il db o qui in locale (togliere le tracce già nella playlist)
 //        model.addAttribute("notAddedTracks", trackDAO.getAllByPlaylistId(selectedPlaylistId));
         return Route.PLAYLIST.show();
@@ -45,12 +52,8 @@ public class PlaylistController {
 
     @PostMapping("/add_track_to_playlist")
     public String addPlaylist(PlaylistForm playlistForm, HttpSession session) {
-        try {
-            playlistForm.toPlaylistTracks(SessionService.getSelectedPlaylistId(session)).forEach(playlistTracksDAO::save);
-        } catch (MissingSessionAttribute e) {
-            return Route.HOME.go();
-        }
-        return Route.PLAYLIST.reload();
+        playlistForm.toPlaylistTracks(playlistId).forEach(playlistTracksDAO::save);
+        return "redirect:view/" + userId + "/" + playlistId + "/0";
     }
 
     @GetMapping("/select_track")

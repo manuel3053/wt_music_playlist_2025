@@ -1,7 +1,7 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
 import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
-import it.polimi.tiw.wt_music_playlist_2025.adapter.UserForm;
+import it.polimi.tiw.wt_music_playlist_2025.form.UserForm;
 import it.polimi.tiw.wt_music_playlist_2025.entity.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
