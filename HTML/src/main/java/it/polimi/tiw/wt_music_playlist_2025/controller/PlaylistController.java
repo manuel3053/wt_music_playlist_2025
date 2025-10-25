@@ -3,6 +3,7 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.File;
+import java.util.List;
 
 @Controller
 @RequestMapping("/playlist")
@@ -38,21 +42,27 @@ public class PlaylistController {
         }
         this.userId = playlistId;
         this.playlistId = playlistId;
-        model.addAttribute("tracks", trackDAO.getPlaylistTracksGroup(playlistId, offset * 5));
+        List<Track> tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5);
+        model.addAttribute("tracks", tracks);
+        model.addAttribute("tracksCovers", tracks.stream().map((track) -> {
+            File file = new File(track.getImagePath());
+            if (!file.exists()) {
+                return null;
+            }
+            return file;
+        }));
         model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(playlistId));
         model.addAttribute("userId", userId);
         model.addAttribute("playlistId", playlistId);
         model.addAttribute("offset", offset);
         model.addAttribute("playlistForm", new PlaylistForm());
 
-        // vedere se abbia senso fare l'operazione con il db o qui in locale (togliere le tracce già nella playlist)
-//        model.addAttribute("notAddedTracks", trackDAO.getAllByPlaylistId(selectedPlaylistId));
         return Route.PLAYLIST.show();
     }
 
     @PostMapping("/add_track_to_playlist")
     public String addPlaylist(PlaylistForm playlistForm, HttpSession session) {
-        playlistForm.toPlaylistTracks(playlistId).forEach(playlistTracksDAO::save);
+        playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
         return "redirect:view/" + userId + "/" + playlistId + "/0";
     }
 

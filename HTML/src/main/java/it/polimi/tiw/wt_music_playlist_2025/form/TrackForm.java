@@ -5,10 +5,13 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 public class TrackForm {
-//    private String file;
-//    private String image;
     private MultipartFile file;
     private MultipartFile image;
     private String title;
@@ -16,8 +19,15 @@ public class TrackForm {
     private String albumTitle;
     private int albumPublicationYear;
     private Genre genre;
+    private String dbMediaPath;
+    private int userId;
 
-    public Track toTrack(String folderMediaPath, int userId) {
+    public void init(String dbMediaPath, int userId) {
+        this.dbMediaPath = dbMediaPath;
+        this.userId = userId;
+    }
+
+    public Track toTrack() {
         Track track = new Track();
         track.setTitle(title);
         track.setAuthor(author);
@@ -25,28 +35,23 @@ public class TrackForm {
         track.setAlbumPublicationYear(albumPublicationYear);
         track.setGenre(genre.toString());
         track.setLoaderId(userId);
-        track.setImagePath(folderMediaPath + userId + File.separator + image.getName());
-        track.setFilePath(folderMediaPath + userId + File.separator + file.getName());
-//        track.setImagePath(folderMediaPath + userId + File.separator + image);
-//        track.setFilePath(folderMediaPath + userId + File.separator + file);
+        System.out.println(userId);
+        track.setFilePath(getMusicPath());
+        track.setImagePath(getImagePath());
         return track;
     }
 
-//    public String getFile() {
-//        return file;
-//    }
-//
-//    public void setFile(String file) {
-//        this.file = file;
-//    }
-//
-//    public String getImage() {
-//        return image;
-//    }
-//
-//    public void setImage(String image) {
-//        this.image = image;
-//    }
+    private String getPath(MultipartFile file) {
+        return dbMediaPath + userId + File.separator + albumTitle + File.separator + file.getOriginalFilename();
+    }
+
+    public String getMusicPath() {
+        return getPath(file);
+    }
+
+    public String getImagePath() {
+        return getPath(image);
+    }
 
     public MultipartFile getFile() {
         return file;

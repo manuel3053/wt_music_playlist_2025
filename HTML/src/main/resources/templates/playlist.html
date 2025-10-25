@@ -14,6 +14,10 @@
                     <a class="link-button" th:if="${offset > 0}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset - 1}}">Prev</a>
                 </td>
                 <td class="carousel-cell" th:each="track : ${tracks}" th:unless="${trackStat.index > 4}">
+<!--                    <div th:if="${tracksCovers[trackStat.index]} != null">-->
+<!--                        <img th:src="${track.imagePath}" th:alt="${track.title}"/>-->
+                    <img th:src="${track.imagePath}"/>
+<!--                    </div>-->
                     <a th:text="${track.title}" class="link-button" th:href="@{'/track/view/' + ${userId} + '/' + ${trackStat.index}}" ></a>
                 </td>
                 <td>

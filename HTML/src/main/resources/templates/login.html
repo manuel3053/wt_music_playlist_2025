@@ -10,7 +10,7 @@
     <div class = "login">
         <form th:action="@{/login/login}" method="post" th:object="${userForm}" class="form">
             <label class="form-field-name">Name</label>
-            <input class="form-field" type="text" th:field="*{username}" placeholder="Surname" required>
+            <input class="form-field" type="text" th:field="*{username}" placeholder="Username" required>
             <label class="form-field-name">Password</label>
             <input class="form-field" type="text" th:field="*{password}" placeholder="Password" required>
             <input class="form-button" type="submit" value="Login"/>

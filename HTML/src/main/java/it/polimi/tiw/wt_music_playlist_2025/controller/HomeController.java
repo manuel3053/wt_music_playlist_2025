@@ -15,6 +15,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Controller
@@ -25,14 +31,12 @@ public class HomeController {
     private String mediaPath;
     private List<Track> tracks;
 
-    public HomeController(UserDAO userDAO, PlaylistDAO playlistDAO, TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO) {
-        this.userDAO = userDAO;
+    public HomeController(PlaylistDAO playlistDAO, TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO) {
         this.playlistDAO = playlistDAO;
         this.trackDAO = trackDAO;
         this.playlistTracksDAO = playlistTracksDAO;
     }
 
-    private final UserDAO userDAO;
     private final PlaylistDAO playlistDAO;
     private final TrackDAO trackDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
@@ -46,7 +50,8 @@ public class HomeController {
             return Route.LOGIN.go();
         }
         model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
-        model.addAttribute("trackForm", new TrackForm());
+        TrackForm trackForm = new TrackForm();
+        model.addAttribute("trackForm", trackForm);
         model.addAttribute("playlistForm", new PlaylistForm());
         tracks = trackDAO.getAllByUserIdSorted(userId);
         model.addAttribute("tracks", tracks);
@@ -57,14 +62,28 @@ public class HomeController {
 
     @PostMapping("/add_track")
     public String addTrack(TrackForm trackForm) {
-        trackDAO.save(trackForm.toTrack(mediaPath, userId));
+        trackForm.init(mediaPath, userId);
+        Track track = trackForm.toTrack();
+        try {
+            saveFile(trackForm.getFile(), trackForm.getMusicPath());
+            saveFile(trackForm.getImage(), trackForm.getImagePath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        trackDAO.save(track);
         return Route.HOME.reload();
+    }
+
+    private void saveFile(MultipartFile file, String path) throws IOException {
+            Path p = Paths.get(path);
+            p.getParent().toFile().mkdirs();
+            Files.copy(file.getInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @PostMapping("/add_playlist")
     public String addPlaylist(PlaylistForm playlistForm) {
         Playlist insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
-        playlistForm.toPlaylistTracks(insertedPlaylist.getId()).forEach(playlistTracksDAO::save);
+        playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(insertedPlaylist.getId()));
         return Route.HOME.reload();
     }
 
