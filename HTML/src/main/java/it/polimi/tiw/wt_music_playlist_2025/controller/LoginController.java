@@ -21,9 +21,12 @@ public class LoginController {
     private final UserDAO userDAO;
 
     @GetMapping("/view")
-    public String showPage(Model model) {
+    public String showPage(Model model, HttpSession session) {
         model.addAttribute("userForm", new UserForm());
-        return Route.LOGIN.show();
+//        return Route.LOGIN.show();
+        // Per non impazzire durante il testing
+        SessionService.setUser(session, userDAO.findUserByUsernameAndPassword("s", "s"));
+        return Route.HOME.go();
     }
 
     @PostMapping("/login")
