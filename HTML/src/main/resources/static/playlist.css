@@ -17,3 +17,19 @@
 .carousel-cell {
     width: 20%;
 }
+
+.missing-tracks-list {
+    width: 100%;
+    align-items: center;
+    background-color: grey;
+}
+
+.form-button {
+    grid-column: span 2;
+}
+
+.form {
+    align-items: center;
+    justify-content: center;
+}
+

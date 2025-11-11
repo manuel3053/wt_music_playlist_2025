@@ -11,8 +11,12 @@ public class SessionService {
 
     private SessionService() {}
 
-    static boolean checkValidAccess(HttpSession session, int userId) throws MissingSessionAttribute {
-        if (userId != getUser(session).getId()) {
+    static boolean checkValidAccess(HttpSession session, int userId) {
+        try {
+            if (userId != getUser(session).getId()) {
+                return false;
+            }
+        } catch (MissingSessionAttribute e) {
             return false;
         }
         return true;

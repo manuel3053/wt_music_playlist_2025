@@ -3,12 +3,10 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
 import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
 import it.polimi.tiw.wt_music_playlist_2025.form.TrackForm;
 import it.polimi.tiw.wt_music_playlist_2025.entity.*;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +60,7 @@ public class HomeController {
 
     @PostMapping("/add_track")
     public String addTrack(TrackForm trackForm) {
-        trackForm.init(mediaPath, userId);
+        trackForm.prepare(userId);
         Track track = trackForm.toTrack();
         try {
             saveFile(trackForm.getFile(), trackForm.getMusicPath());
@@ -75,7 +73,7 @@ public class HomeController {
     }
 
     private void saveFile(MultipartFile file, String path) throws IOException {
-            Path p = Paths.get(path);
+            Path p = Paths.get(mediaPath + File.separator + path);
             p.getParent().toFile().mkdirs();
             Files.copy(file.getInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
     }

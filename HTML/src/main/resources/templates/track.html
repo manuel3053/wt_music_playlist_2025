@@ -9,7 +9,9 @@
 <body>
     <div class = "track">
         <div class="track-content">
-            <div class="album-cover">ciao?</div>
+            <div class="album-cover">
+                <img th:src="@{'/cover/2/dlkfjldkjgl/20251012_11h07m25s_grim.png'}" th:alt="${track.title}" width="600" height="600"/>
+            </div>
             <div class="attribute-name">Title:</div>
             <div class="attribute" th:text="${track.title}"></div>
             <div class="attribute-name">Author:</div>

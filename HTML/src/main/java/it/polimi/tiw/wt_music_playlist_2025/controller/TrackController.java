@@ -21,11 +21,7 @@ public class TrackController {
 
     @GetMapping("/view/{user_id}/{track_id}")
     public String showPage(Model model, HttpSession session, @PathVariable("user_id") int userId, @PathVariable("track_id") int trackId) {
-        try {
-            if (!SessionService.checkValidAccess(session, userId)) {
-                return Route.LOGIN.go();
-            }
-        } catch (MissingSessionAttribute e) {
+        if (!SessionService.checkValidAccess(session, userId)) {
             return Route.LOGIN.go();
         }
         model.addAttribute("track", trackDAO.findTrackById(trackId));

@@ -5,11 +5,6 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 
 public class TrackForm {
     private MultipartFile file;
@@ -19,11 +14,9 @@ public class TrackForm {
     private String albumTitle;
     private int albumPublicationYear;
     private Genre genre;
-    private String dbMediaPath;
     private int userId;
 
-    public void init(String dbMediaPath, int userId) {
-        this.dbMediaPath = dbMediaPath;
+    public void prepare(int userId) {
         this.userId = userId;
     }
 
@@ -35,14 +28,13 @@ public class TrackForm {
         track.setAlbumPublicationYear(albumPublicationYear);
         track.setGenre(genre.toString());
         track.setLoaderId(userId);
-        System.out.println(userId);
         track.setFilePath(getMusicPath());
         track.setImagePath(getImagePath());
         return track;
     }
 
     private String getPath(MultipartFile file) {
-        return dbMediaPath + userId + File.separator + albumTitle + File.separator + file.getOriginalFilename();
+        return userId + File.separator + albumTitle + File.separator + file.getOriginalFilename();
     }
 
     public String getMusicPath() {
