@@ -22,6 +22,10 @@
     grid-column: span 1;
 }
 
+.link-button:hover {
+    grid-column: span 1;
+}
+
 .playlist-track-cover {
     object-fit: scale-down;
     width: 100%;

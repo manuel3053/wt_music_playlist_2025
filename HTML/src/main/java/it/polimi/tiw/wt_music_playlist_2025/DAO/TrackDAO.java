@@ -12,7 +12,6 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
 
     Track save(Track track);
     Track findTrackById(int id);
-    List<Track> getAllByLoaderId(int loaderId);
     @NativeQuery(
             value = "select t.* " +
                     "from track t join user u on t.loader_id = u.id " +
