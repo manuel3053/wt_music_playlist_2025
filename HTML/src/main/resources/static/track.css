@@ -9,7 +9,7 @@
 .track-content {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: repeat(6, 1fr);
     column-gap: 20px;
     height: 50vh;
     width: 90vw;

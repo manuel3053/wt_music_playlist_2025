@@ -22,6 +22,9 @@
             <div class="attribute" th:text="${track.albumPublicationYear}"></div>
             <div class="attribute-name">Genre: </div>
             <div class="attribute" th:text="${track.genre}"></div>
+            <audio controls>
+                <source th:src="@{'/file/' + ${track.filePath}}" th:alt="${track.title}"/>
+            </audio>
         </div>
     </div>
 </body>
