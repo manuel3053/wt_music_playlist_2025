@@ -20,7 +20,6 @@
 .album-cover {
     display: flex;
     grid-row: span 5;
-    background-color: grey;
 }
 
 .attribute {

@@ -8,24 +8,20 @@
 </head>
 <body>
     <div class = "playlist">
-        <table class="carousel">
-            <tr>
-                <td>
-                    <a class="link-button" th:if="${offset > 0}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset - 1}}">Prev</a>
-                </td>
-                <td class="carousel-cell" th:each="track : ${tracks}" th:unless="${trackStat.index > 4}">
-                    <div th:if="${tracksCovers[trackStat.index]} != null">
-                        <img th:src="@{'/cover/' + ${track.imagePath}}" th:alt="${track.title}" width="300" height="300"/>
-                    </div>
-                    <a th:text="${track.title}" class="link-button" th:href="@{'/track/view/' + ${userId} + '/' + ${track.id}}" ></a>
-                </td>
-                <td>
-                    <a class="link-button" th:if="${offset < #lists.size(tracks) and #lists.size(tracks) > 5}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset + 1}}">Next</a>
-                </td>
-            </tr>
-        </table>
+        <div class="carousel">
+            <a class="link-button" th:if="${offset > 0}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset - 1}}">Prev</a>
+            <div th:if="${offset <= 0}"></div>
+            <div class="carousel-cell" th:each="track : ${tracks}" th:unless="${trackStat.index > 4}">
+                <div th:if="${tracksCovers[trackStat.index]} != null">
+                    <img class="playlist-track-cover" th:src="@{'/cover/' + ${track.imagePath}}"/>
+                </div>
+                <a th:text="${track.title}" class="link-button" th:href="@{'/track/view/' + ${userId} + '/' + ${track.id}}" ></a>
+            </div>
+            <div th:if="${offset >= #lists.size(tracks) or #lists.size(tracks) <= 5}"></div>
+            <a class="link-button" th:if="${offset < #lists.size(tracks) and #lists.size(tracks) > 5}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset + 1}}">Next</a>
+        </div>
         <form th:if="${#lists.size(tracksNotInPlaylist) != 0}" th:action="@{/playlist/add_track_to_playlist}" method="post" th:object="${playlistForm}" class="form">
-            <table class="missing-tracks-list">
+            <table class="form-tracks-list">
                 <tr>
                     <th></th>
                     <th>Track title</th>

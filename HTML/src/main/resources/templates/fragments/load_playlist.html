@@ -1,21 +1,19 @@
-<div th:fragment="load_playlist" class="load-playlist">
+<div th:fragment="load_playlist">
     <form th:action="@{/home/add_playlist}" method="post" th:object="${playlistForm}" class="form">
         <label class="form-field-name">Title</label>
         <input class="form-field" type="text" th:field="*{title}" placeholder="Title" required>
-        <table class="form-tracks-list">
-            <tr>
-                <th></th>
-                <th>Track title</th>
-                <th>Track album</th>
-            </tr>
-            <tr th:each="track : ${tracks}">
-                <td><input type="checkbox"
-                           th:field="*{selectedTracks}" th:value="${track.id}"></td>
-                </td>
-                <td><span th:text="${track.title}"> Title </span></td>
-                <td><span th:text="${track.albumTitle}"> Author </span></td>
-            </tr>
-        </table>
+        <div class="form-tracks-list">
+            <div class="form-tracks-list-body">
+                <div></div>
+                <div>Track title</div>
+                <div>Track album</div>
+            </div>
+            <div class="form-tracks-list-body" th:each="track : ${tracks}">
+                    <input type="checkbox" th:field="*{selectedTracks}" th:value="${track.id}">
+                    <div th:text="${track.title}"></div>
+                    <div th:text="${track.albumTitle}"></div>
+            </div>
+        </div>
         <input class="form-button" type="submit"/>
     </form>
 </div>
