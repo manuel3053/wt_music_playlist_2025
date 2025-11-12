@@ -26,7 +26,7 @@ public class LoginController {
 //        return Route.LOGIN.show();
         // Per non impazzire durante il testing
         SessionService.setUser(session, userDAO.findUserByUsernameAndPassword("s", "s"));
-        return Route.PLAYLIST.go() + "/2/6/0";
+        return Route.HOME.go();
     }
 
     @PostMapping("/login")
