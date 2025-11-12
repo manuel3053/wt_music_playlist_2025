@@ -102,6 +102,12 @@ option:hover {
     text-align: center;
 }
 
+.track-cover {
+    object-fit: scale-down;
+    width: 100%;
+    max-height: 100%;
+}
+
 .form-tracks-list {
     grid-column: span 2;
     width: 100%;

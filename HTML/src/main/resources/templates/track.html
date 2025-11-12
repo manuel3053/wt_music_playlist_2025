@@ -10,7 +10,7 @@
     <div class = "track">
         <div class="track-content">
             <div class="album-cover">
-                <img th:src="@{'/cover/' + ${track.imagePath}}" th:alt="${track.title}" width="300" height="300"/>
+                <img class="track-cover" th:src="@{'/file/' + ${track.imagePath}}" th:alt="${track.title}"/>
             </div>
             <div class="attribute-name">Title:</div>
             <div class="attribute" th:text="${track.title}"></div>

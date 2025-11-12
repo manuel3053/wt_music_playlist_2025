@@ -1,11 +1,7 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,8 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Controller
-@RequestMapping("/cover")
-public class CoverController {
+@RequestMapping("/file")
+public class FileController {
 
     @GetMapping("/{user_id}/{album_name}/{file_name}")
     public ResponseEntity<UrlResource> serveSafeFile(HttpServletResponse response, HttpSession session, @PathVariable("user_id") String userId, @PathVariable("album_name") String albumName, @PathVariable("file_name") String fileName) throws IOException {

@@ -12,7 +12,7 @@
             <a class="link-button" th:if="${offset * 5 > 0}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset - 1}}">Prev</a>
             <div th:unless="${offset * 5 > 0}"></div>
             <div class="carousel-cell" th:each="track : ${tracks}" th:unless="${trackStat.index > 4}">
-                <img class="playlist-track-cover" th:src="@{'/cover/' + ${track.imagePath}}"/>
+                <img class="track-cover" th:src="@{'/file/' + ${track.imagePath}}"/>
                 <a th:text="${track.title}" class="link-button" th:href="@{'/track/view/' + ${userId} + '/' + ${track.id}}" ></a>
             </div>
             <a class="link-button" th:if="${(offset + 1) * 5 < playlistSize and playlistSize > 5}" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlistId} + '/' + ${offset + 1}}">Next</a>
