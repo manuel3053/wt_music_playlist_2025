@@ -34,10 +34,15 @@ public class PlaylistController {
         }
         this.userId = playlistId;
         this.playlistId = playlistId;
-        List<Track> tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5);
+        List<Track> tracks;
+        try {
+            tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5);
+            model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId).size());
+            model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(playlistId));
+        } catch (RuntimeException e) {
+            return Route.HOME.go();
+        }
         model.addAttribute("tracks", tracks);
-        model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId).size());
-        model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(playlistId));
         model.addAttribute("userId", userId);
         model.addAttribute("playlistId", playlistId);
         model.addAttribute("offset", offset);
@@ -47,7 +52,11 @@ public class PlaylistController {
 
     @PostMapping("/add_track_to_playlist")
     public String addTrackToPlaylist(PlaylistForm playlistForm, HttpSession session) {
-        playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
+        try {
+            playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
+        } catch (RuntimeException e) {
+            return "redirect:view/" + userId + "/" + playlistId + "/0";
+        }
         return "redirect:view/" + userId + "/" + playlistId + "/0";
     }
 

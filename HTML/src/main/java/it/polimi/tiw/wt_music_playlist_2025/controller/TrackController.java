@@ -24,7 +24,11 @@ public class TrackController {
         if (!SessionService.checkValidAccess(session, userId)) {
             return Route.LOGIN.go();
         }
-        model.addAttribute("track", trackDAO.findTrackById(trackId));
+        try {
+            model.addAttribute("track", trackDAO.findTrackById(trackId));
+        } catch (RuntimeException e) {
+            return Route.HOME.go();
+        }
         return Route.TRACK.show();
     }
 

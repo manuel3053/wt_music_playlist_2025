@@ -47,11 +47,16 @@ public class HomeController {
         } catch (MissingSessionAttribute e) {
             return Route.LOGIN.go();
         }
-        model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
+
+        try {
+            model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
+            tracks = trackDAO.getAllByUserIdSorted(userId);
+        } catch (RuntimeException e) {
+            return Route.LOGIN.go();
+        }
         TrackForm trackForm = new TrackForm();
         model.addAttribute("trackForm", trackForm);
         model.addAttribute("playlistForm", new PlaylistForm());
-        tracks = trackDAO.getAllByUserIdSorted(userId);
         model.addAttribute("tracks", tracks);
         model.addAttribute("genres", Genre.values());
         model.addAttribute("userId", userId);
@@ -63,16 +68,20 @@ public class HomeController {
         trackForm.prepare(userId);
         Track track = trackForm.toTrack();
         try {
-            saveFile(trackForm.getFile(), trackForm.getMusicPath());
-            saveFile(trackForm.getImage(), trackForm.getImagePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            saveFile(trackForm.getFile(), trackForm.getMusicPath(), "audio");
+            saveFile(trackForm.getImage(), trackForm.getImagePath(), "image");
+            trackDAO.save(track);
+        } catch (Exception e) {
+            return Route.HOME.reload();
         }
-        trackDAO.save(track);
+
         return Route.HOME.reload();
     }
 
-    private void saveFile(MultipartFile file, String path) throws IOException {
+    private void saveFile(MultipartFile file, String path, String type) throws IOException, InvalidFileType {
+            if (!file.getContentType().startsWith(type)) {
+                throw new InvalidFileType("type");
+            }
             Path p = Paths.get(mediaPath + File.separator + path);
             p.getParent().toFile().mkdirs();
             Files.copy(file.getInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
@@ -80,7 +89,12 @@ public class HomeController {
 
     @PostMapping("/add_playlist")
     public String addPlaylist(PlaylistForm playlistForm) {
-        Playlist insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
+        Playlist insertedPlaylist;
+        try {
+            insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
+        } catch (Exception e) {
+            return Route.HOME.reload();
+        }
         playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(insertedPlaylist.getId()));
         return Route.HOME.reload();
     }

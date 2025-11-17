@@ -7,6 +7,7 @@ CREATE TABLE user
     surname  VARCHAR(64) not null,
 
     PRIMARY KEY (id),
+    UNIQUE KEY `username` (`username`)
     UNIQUE (username)
 );
 

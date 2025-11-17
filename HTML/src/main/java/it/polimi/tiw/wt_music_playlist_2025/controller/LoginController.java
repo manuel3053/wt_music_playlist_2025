@@ -23,15 +23,18 @@ public class LoginController {
     @GetMapping("/view")
     public String showPage(Model model, HttpSession session) {
         model.addAttribute("userForm", new UserForm());
-//        return Route.LOGIN.show();
-        // Per non impazzire durante il testing
-        SessionService.setUser(session, userDAO.findUserByUsernameAndPassword("s", "s"));
-        return Route.HOME.go();
+        return Route.LOGIN.show();
     }
 
     @PostMapping("/login")
     public String login(UserForm userForm, HttpSession session) {
-        User user = userDAO.findUserByUsernameAndPassword(userForm.getUsername(), userForm.getPassword());
+        User user;
+        try {
+            user = userDAO.findUserByUsernameAndPassword(userForm.getUsername(), userForm.getPassword());
+        } catch (RuntimeException e) {
+            return Route.LOGIN.reload();
+        }
+
         if (user == null) {
             return Route.LOGIN.reload();
         } else {
