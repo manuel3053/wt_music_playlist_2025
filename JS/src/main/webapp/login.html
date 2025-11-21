@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <style id="login-style"></style>
 </head>
 <body>
-  ciao
+    <div class = "login">
+        <form method="post" class="form">
+            <label class="form-field-name">Name</label>
+            <input class="form-field" type="text" th:field="*{username}" placeholder="Username" required>
+            <label class="form-field-name">Password</label>
+            <input class="form-field" type="password" th:field="*{password}" placeholder="Password" required>
+            <input class="form-button" type="submit" value="Login"/>
+            <a class="subscribe-link" th:href="@{/subscribe/view}">Not subscribed?</a>
+        </form>
+    </div>
 </body>
 </html>
-

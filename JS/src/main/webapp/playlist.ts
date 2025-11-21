@@ -1,4 +1,5 @@
-import { App, Component } from "./app"
+import { App } from "./app"
+import { Component } from "./component"
 // import "./static/playlist.css"
 
 export class Playlist implements Component {

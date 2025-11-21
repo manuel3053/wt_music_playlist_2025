@@ -1,4 +1,5 @@
-import { App, Component } from "./app"
+import { App } from "./app"
+import { Component } from "./component"
 import { Playlist } from "./playlist"
 
 export class HomePage implements Component {
@@ -83,8 +84,6 @@ export class HomePage implements Component {
                   </div>
                   <div class="form-tracks-list-body">
                           <input type="checkbox">
-                          <div></div>
-                          <div></div>
                   </div>
               </div>
               <input class="form-button" type="submit"/>

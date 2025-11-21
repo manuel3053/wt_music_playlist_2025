@@ -1,12 +1,18 @@
+import { Component } from "./component"
 import { HomePage } from "./homepage"
+import "./static/style.css"
 
-export class App {
+export class App implements Component {
 
   constructor() {
     this.currentPage = new HomePage(this)
 
-    const style: HTMLElement = document.getElementById("app-style")!
-    style.innerHTML = `
+    // const style: HTMLElement = document.getElementById("app-style")!
+    // style.innerHTML = this.css
+  }
+
+  get css(): string {
+    return `
       @import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
       :root {
@@ -158,6 +164,13 @@ export class App {
     `
   }
 
+  get template(): string {
+    return ""
+  }
+
+  buildEventListeners(): void {
+  }
+
   public set currentPage(page: Component) {
     const app: HTMLElement = document.getElementById("app")!
     app.innerHTML = page.template
@@ -166,12 +179,6 @@ export class App {
     page.buildEventListeners()
   }
 
-}
-
-export interface Component {
-  get css(): string
-  get template(): string
-  buildEventListeners(): void
 }
 
 document.addEventListener('DOMContentLoaded', () => new App())
