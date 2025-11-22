@@ -3,18 +3,18 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
+import it.polimi.tiw.wt_music_playlist_2025.request.PlaylistForm;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-@Controller
+@CrossOrigin
+@RestController
 @RequestMapping("/playlist")
 public class PlaylistController {
     private final TrackDAO trackDAO;
@@ -51,13 +51,23 @@ public class PlaylistController {
     }
 
     @PostMapping("/add_track_to_playlist")
-    public String addTrackToPlaylist(PlaylistForm playlistForm, HttpSession session) {
+    public void addTrackToPlaylist(PlaylistForm playlistForm, HttpSession session) {
         try {
             playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
         } catch (RuntimeException e) {
-            return "redirect:view/" + userId + "/" + playlistId + "/0";
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
         }
-        return "redirect:view/" + userId + "/" + playlistId + "/0";
+    }
+
+    @GetMapping("/get_playlist_size_by_id")
+    public Integer getPlaylistSizeById(HttpSession session, @RequestParam(name = "id") Integer id) {
+        try {
+            int size = playlistTracksDAO.getAllByPlaylistId(id).size();
+            System.out.println(size);
+            return playlistTracksDAO.getAllByPlaylistId(id).size();
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
+        }
     }
 
 }

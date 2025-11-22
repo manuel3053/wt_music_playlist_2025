@@ -1,18 +1,26 @@
+import { ApiRepository, PlaylistRepository, UserRepository } from "./api.service"
+import { User } from "./model/user"
 import "./static/style.css"
 
 class Login {
+  private _userRepository: UserRepository = new UserRepository()
+  private _playlistRepository: PlaylistRepository = new PlaylistRepository()
+
   constructor() {
-    // const style: HTMLElement = document.getElementById("login-style")!
-    // style.innerHTML = `@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');`
-    // window.location.href = "app.html"
-  }
-
-  get css(): string {
-    throw new Error("Method not implemented.");
-  }
-
-  buildEventListeners(): void {
-    throw new Error("Method not implemented.");
+    document.getElementById("test-button")?.addEventListener(
+      "click",
+      () => {
+        let user: User = new User()
+        user.name = "nuovo"
+        user.surname = "nuovo"
+        user.username = "nuovo"
+        user.password = "nuovo"
+        this._playlistRepository.getPlaylistSizeById(6).then(size => console.log(size))
+        this._userRepository.login("s", "s").then(user => {
+          document.getElementById("test-button")!.innerText = user.username
+        })
+      }
+    )
   }
 
 }

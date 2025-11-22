@@ -1,4 +1,4 @@
-package it.polimi.tiw.wt_music_playlist_2025.form;
+package it.polimi.tiw.wt_music_playlist_2025.request;
 
 import it.polimi.tiw.wt_music_playlist_2025.entity.Genre;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
