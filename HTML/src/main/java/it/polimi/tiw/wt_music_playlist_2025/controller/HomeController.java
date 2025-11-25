@@ -8,10 +8,6 @@ import it.polimi.tiw.wt_music_playlist_2025.form.TrackForm;
 import it.polimi.tiw.wt_music_playlist_2025.entity.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +23,6 @@ import java.security.Principal;
 import java.util.List;
 
 @Controller
-@RequestMapping("/home")
 public class HomeController {
 
     @Value("${db.mediaPath}")
@@ -43,19 +38,10 @@ public class HomeController {
     private final PlaylistDAO playlistDAO;
     private final TrackDAO trackDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
-    private int userId;
 
-    @GetMapping("/view")
+    @GetMapping("/home")
     public String showPage(Model model, HttpSession session) {
-        UserWithId userWithId = (UserWithId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(userWithId.getId());
-        System.out.println(userWithId.getUsername());
-//        try {
-//            userId = SessionService.getUser(session).getId();
-//        } catch (MissingSessionAttribute e) {
-//            return Route.LOGIN.go();
-//        }
-
+        int userId = UserDetailsExtractor.getUserId();
         try {
             model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
             tracks = trackDAO.getAllByUserIdSorted(userId);
@@ -71,40 +57,40 @@ public class HomeController {
         return Route.HOME.show();
     }
 
-    @PostMapping("/add_track")
+    @PostMapping("/home/add_track")
     public String addTrack(TrackForm trackForm) {
-        trackForm.prepare(userId);
+        trackForm.prepare(UserDetailsExtractor.getUserId());
         Track track = trackForm.toTrack();
         try {
             saveFile(trackForm.getFile(), trackForm.getMusicPath(), "audio");
             saveFile(trackForm.getImage(), trackForm.getImagePath(), "image");
             trackDAO.save(track);
         } catch (Exception e) {
-            return Route.HOME.reload();
+            return Route.HOME.go();
         }
 
-        return Route.HOME.reload();
+        return Route.HOME.go();
     }
 
     private void saveFile(MultipartFile file, String path, String type) throws IOException, InvalidFileType {
-            if (!file.getContentType().startsWith(type)) {
-                throw new InvalidFileType("type");
-            }
-            Path p = Paths.get(mediaPath + File.separator + path);
-            p.getParent().toFile().mkdirs();
-            Files.copy(file.getInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
+        if (!file.getContentType().startsWith(type)) {
+            throw new InvalidFileType("type");
+        }
+        Path p = Paths.get(mediaPath + File.separator + path);
+        p.getParent().toFile().mkdirs();
+        Files.copy(file.getInputStream(), p, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    @PostMapping("/add_playlist")
+    @PostMapping("/home/add_playlist")
     public String addPlaylist(PlaylistForm playlistForm) {
         Playlist insertedPlaylist;
         try {
-            insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(userId, tracks));
+            insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(UserDetailsExtractor.getUserId(), tracks));
         } catch (Exception e) {
-            return Route.HOME.reload();
+            return Route.HOME.go();
         }
         playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(insertedPlaylist.getId()));
-        return Route.HOME.reload();
+        return Route.HOME.go();
     }
 
 }

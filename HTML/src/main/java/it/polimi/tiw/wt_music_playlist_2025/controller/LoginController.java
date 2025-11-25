@@ -24,8 +24,7 @@ public class LoginController {
     private final UserDAO userDAO;
 
     @GetMapping("/login")
-    public String showPage(Model model, HttpSession session) {
-        System.out.println("buonasera");
+    public String showPage() {
         return Route.LOGIN.show();
     }
 

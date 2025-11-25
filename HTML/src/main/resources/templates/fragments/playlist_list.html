@@ -1,11 +1,11 @@
-<div th:fragment="playlist_list" class="playlist-list">
+<div th:fragment="playlist_list" class="playlist-list" xmlns:th="http://www.w3.org/1999/xhtml">
     <form class="form-playlist-list">
         <div class="playlist-list-body">
             <div>Track title</div>
             <div>Track album</div>
         </div>
         <div class="playlist-list-body" th:each="playlist : ${playlists}">
-            <a class="link-button" th:href="@{'/playlist/view/' + ${userId} + '/' + ${playlist.id} + '/0'}" th:text="${playlist.title}" th:object="${userId}"></a>
+            <a class="link-button" th:href="@{'/playlist/' + ${playlist.id} + '/0'}" th:text="${playlist.title}" th:object="${userId}"></a>
             <span th:text="${playlist.creationDate}"></span>
         </div>
     </form>

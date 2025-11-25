@@ -1,4 +1,4 @@
-<div th:fragment="load_playlist">
+<div th:fragment="load_playlist" xmlns:th="http://www.w3.org/1999/xhtml">
     <form th:action="@{/home/add_playlist}" method="post" th:object="${playlistForm}" class="form">
         <label class="form-field-name">Title</label>
         <input class="form-field" type="text" th:field="*{title}" placeholder="Title" required>

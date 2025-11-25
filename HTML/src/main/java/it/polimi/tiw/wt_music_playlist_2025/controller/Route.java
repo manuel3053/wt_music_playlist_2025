@@ -8,15 +8,7 @@ public enum Route {
     SUBSCRIBE("subscribe");
 
     public String go() {
-        return "redirect:/" + path + "/view";
-    }
-
-    public String goWithIndex(int index) {
-        return "redirect:/" + path + "/view" + index;
-    }
-
-    public String reload() {
-        return "redirect:view";
+        return "redirect:/" + path;
     }
 
     public String show() {

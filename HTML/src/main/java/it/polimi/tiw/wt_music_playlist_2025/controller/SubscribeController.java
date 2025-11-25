@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
-@RequestMapping("/subscribe")
 public class SubscribeController {
 
     public SubscribeController(UserDAO userDAO) {
@@ -23,22 +22,20 @@ public class SubscribeController {
 
     private final UserDAO userDAO;
 
-    @GetMapping("/view")
+    @GetMapping("/subscribe")
     public String showPage(Model model) {
         model.addAttribute("userForm", new UserForm());
         return Route.SUBSCRIBE.show();
     }
 
-    @PostMapping("/subscribe")
-    public String subscribe(UserForm userForm, HttpSession session) {
-        User user;
+    @PostMapping("/subscribe/submit")
+    public String subscribe(UserForm userForm) {
         try {
-            user = userDAO.save(userForm.toUser());
+            userDAO.save(userForm.toUser());
         } catch (RuntimeException e) {
-            return Route.SUBSCRIBE.reload();
+            return Route.SUBSCRIBE.go();
         }
-        SessionService.setUser(session, user);
-        return Route.HOME.go();
+        return Route.LOGIN.go();
     }
 
 

@@ -11,7 +11,9 @@ import java.util.List;
 public interface TrackDAO extends JpaRepository<Track, Integer> {
 
     Track save(Track track);
-    Track findTrackById(int id);
+
+    Track findTrackByIdAndLoaderId(int id, int loaderId);
+
     @NativeQuery(
             value = "select t.* " +
                     "from track t join user u on t.loader_id = u.id " +
@@ -19,6 +21,7 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
                     "order by t.author asc, t.album_publication_year asc, t.id asc"
     )
     List<Track> getAllByUserIdSorted(int userId);
+
     @NativeQuery(
             value = "select t.* " +
                     "from track t join playlist_tracks pt on t.id = pt.track_id " +
@@ -28,6 +31,7 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
                     "fetch next 5 rows only"
     )
     List<Track> getPlaylistTracksGroup(int playlistId, int offset);
+
     @NativeQuery(
             value = "select * " +
                     "from track " +

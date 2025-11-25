@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/playlist")
 public class PlaylistController {
     private final TrackDAO trackDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
@@ -27,12 +26,9 @@ public class PlaylistController {
         this.playlistTracksDAO = playlistTracksDAO;
     }
 
-    @GetMapping("/view/{user_id}/{playlist_id}/{group}")
-    public String showPage(Model model, HttpSession session, @PathVariable("user_id") int userId, @PathVariable("playlist_id") int playlistId, @PathVariable("group") int offset) {
-        if (!SessionService.checkValidAccess(session, userId)) {
-            return Route.LOGIN.go();
-        }
-        this.userId = playlistId;
+    @GetMapping("/playlist/{playlist_id}/{group}")
+    public String showPage(Model model, HttpSession session, @PathVariable("playlist_id") int playlistId, @PathVariable("group") int offset) {
+        this.userId = UserDetailsExtractor.getUserId();
         this.playlistId = playlistId;
         List<Track> tracks;
         try {
@@ -50,7 +46,7 @@ public class PlaylistController {
         return Route.PLAYLIST.show();
     }
 
-    @PostMapping("/add_track_to_playlist")
+    @PostMapping("/playlist/add_track_to_playlist")
     public String addTrackToPlaylist(PlaylistForm playlistForm, HttpSession session) {
         try {
             playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));

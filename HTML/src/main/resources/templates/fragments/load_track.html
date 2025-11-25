@@ -1,4 +1,4 @@
-<div th:fragment="load_track" class="load-track">
+<div th:fragment="load_track" class="load-track" xmlns:th="http://www.w3.org/1999/xhtml">
     <form th:action="@{/home/add_track}" method="post" enctype="multipart/form-data" th:object="${trackForm}" class="form">
         <label class="form-field-name">Title</label>
         <input class="form-field" type="text" th:field="*{title}" placeholder="Title" required>

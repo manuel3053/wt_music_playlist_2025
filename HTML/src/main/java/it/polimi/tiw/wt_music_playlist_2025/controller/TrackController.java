@@ -7,10 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/track")
 public class TrackController {
 
     public TrackController(TrackDAO trackDAO) {
@@ -19,13 +17,14 @@ public class TrackController {
 
     private final TrackDAO trackDAO;
 
-    @GetMapping("/view/{user_id}/{track_id}")
-    public String showPage(Model model, HttpSession session, @PathVariable("user_id") int userId, @PathVariable("track_id") int trackId) {
-        if (!SessionService.checkValidAccess(session, userId)) {
-            return Route.LOGIN.go();
-        }
+    @GetMapping("/track/{track_id}")
+    public String showPage(Model model, @PathVariable("track_id") int trackId) {
         try {
-            model.addAttribute("track", trackDAO.findTrackById(trackId));
+            Track track = trackDAO.findTrackByIdAndLoaderId(trackId, UserDetailsExtractor.getUserId());
+            if (track == null) {
+                return Route.HOME.go();
+            }
+            model.addAttribute("track", track);
         } catch (RuntimeException e) {
             return Route.HOME.go();
         }
