@@ -2,7 +2,6 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 
 import it.polimi.tiw.wt_music_playlist_2025.entity.User;
 import jakarta.servlet.http.HttpSession;
-import org.jboss.weld.context.http.Http;
 
 public class SessionService {
     static private String playlistIdKey = "PLAYLIST_ID";

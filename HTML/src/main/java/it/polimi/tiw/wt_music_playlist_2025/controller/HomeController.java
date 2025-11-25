@@ -8,6 +8,10 @@ import it.polimi.tiw.wt_music_playlist_2025.form.TrackForm;
 import it.polimi.tiw.wt_music_playlist_2025.entity.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -42,11 +47,14 @@ public class HomeController {
 
     @GetMapping("/view")
     public String showPage(Model model, HttpSession session) {
-        try {
-            userId = SessionService.getUser(session).getId();
-        } catch (MissingSessionAttribute e) {
-            return Route.LOGIN.go();
-        }
+        UserWithId userWithId = (UserWithId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(userWithId.getId());
+        System.out.println(userWithId.getUsername());
+//        try {
+//            userId = SessionService.getUser(session).getId();
+//        } catch (MissingSessionAttribute e) {
+//            return Route.LOGIN.go();
+//        }
 
         try {
             model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
