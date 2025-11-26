@@ -6,7 +6,6 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 import it.polimi.tiw.wt_music_playlist_2025.request.PlaylistForm;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,11 +26,11 @@ public class PlaylistController {
         this.playlistTracksDAO = playlistTracksDAO;
     }
 
-    @GetMapping("/view/{user_id}/{playlist_id}/{group}")
+    @PostMapping
+    public Integer
+
+    @GetMapping("/get_all_not_in_playlist")
     public String showPage(Model model, HttpSession session, @PathVariable("user_id") int userId, @PathVariable("playlist_id") int playlistId, @PathVariable("group") int offset) {
-        if (!SessionService.checkValidAccess(session, userId)) {
-            return Route.LOGIN.go();
-        }
         this.userId = playlistId;
         this.playlistId = playlistId;
         List<Track> tracks;

@@ -32,9 +32,12 @@ public class PlaylistController {
         this.playlistId = playlistId;
         List<Track> tracks;
         try {
-            tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5);
-            model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId).size());
-            model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(playlistId));
+            tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5, userId);
+            if (tracks.isEmpty()) {
+                return Route.HOME.go();
+            }
+            model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId, userId).size());
+            model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(userId, playlistId));
         } catch (RuntimeException e) {
             return Route.HOME.go();
         }

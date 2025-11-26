@@ -9,10 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
 @CrossOrigin
 @RestController
 @RequestMapping("/user")
@@ -24,22 +20,21 @@ public class UserController {
 
     private final UserDAO userDAO;
 
-    @PostMapping(value = "/login", consumes = "application/json")
-    public User login(HttpSession session, @RequestBody LoginRequest body) {
-        User user = null;
-        try {
-            user = userDAO.findUserByUsernameAndPassword(body.getUsername(), body.getPassword());
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-        }
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user doesn't exists");
-        } else {
-            SessionService.setUser(session, user);
-            return user;
-        }
-    }
+//    @PostMapping(value = "/login", consumes = "application/json")
+//    public User login(HttpSession session, @RequestBody LoginRequest body) {
+//        User user = null;
+//        try {
+//            user = userDAO.findUserByUsernameAndPassword(body.getUsername(), body.getPassword());
+//        } catch (RuntimeException e) {
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
+//        }
+//
+//        if (user == null) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user doesn't exists");
+//        } else {
+//            return user;
+//        }
+//    }
 
     @PostMapping(value = "/subscribe", consumes = "application/json")
     public void subscribe(HttpSession session, @RequestBody SubscribeRequest body) {
@@ -49,7 +44,6 @@ public class UserController {
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
         }
-        SessionService.setUser(session, user);
     }
 
 

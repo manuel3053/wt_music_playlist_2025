@@ -23,10 +23,6 @@ public class FileController {
 
     @GetMapping("/{user_id}/{album_name}/{file_name}")
     public ResponseEntity<UrlResource> serveSafeFile(HttpServletResponse response, HttpSession session, @PathVariable("user_id") String userId, @PathVariable("album_name") String albumName, @PathVariable("file_name") String fileName) throws IOException {
-        if (!SessionService.checkValidAccess(session, Integer.parseInt(userId))) {
-            response.sendRedirect("/login/view");
-            return ResponseEntity.status(HttpStatus.FOUND).build();
-        }
         Path baseDir = Paths.get("/home/zarch/Documents/tiw_db").toAbsolutePath();
         Path requested = baseDir.resolve(userId + File.separator + albumName + File.separator + fileName).normalize();
 

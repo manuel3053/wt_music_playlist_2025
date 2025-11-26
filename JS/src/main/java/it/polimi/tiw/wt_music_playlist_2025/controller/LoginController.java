@@ -15,10 +15,10 @@ public class LoginController {
 
     private final UserDAO userDAO;
 
-    @GetMapping("/test")
-    public User getUserTest() {
-        return userDAO.findUserById(2);
-    }
+//    @GetMapping("/test")
+//    public User getUserTest() {
+//        return userDAO.findUserById(2);
+//    }
 
 //    @PostMapping("/login")
 //    public String login(UserForm userForm, HttpSession session) {
