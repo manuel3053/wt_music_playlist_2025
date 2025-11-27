@@ -86,10 +86,10 @@ public class HomeController {
         Playlist insertedPlaylist;
         try {
             insertedPlaylist = playlistDAO.save(playlistForm.toPlaylist(UserDetailsExtractor.getUserId(), tracks));
+            playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(insertedPlaylist.getId()));
         } catch (Exception e) {
             return Route.HOME.go();
         }
-        playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(insertedPlaylist.getId()));
         return Route.HOME.go();
     }
 

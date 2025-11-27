@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
-public class TrackForm {
+public class CreateTrackRequest {
     private MultipartFile file;
     private MultipartFile image;
     private String title;

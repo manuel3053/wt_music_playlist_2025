@@ -2,13 +2,12 @@ package it.polimi.tiw.wt_music_playlist_2025.request;
 
 import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class PlaylistForm {
+public class CreatePlaylistRequest {
     private String title;
     private List<Integer> selectedTracks = new ArrayList<>();
 
@@ -28,7 +27,7 @@ public class PlaylistForm {
         this.selectedTracks = selectedTracks;
     }
 
-    public Playlist toPlaylist(int authorId, List<Track> tracks) {
+    public Playlist toPlaylist(int authorId) {
         Playlist playlist = new Playlist();
         playlist.setTitle(title);
         playlist.setAuthorId(authorId);
