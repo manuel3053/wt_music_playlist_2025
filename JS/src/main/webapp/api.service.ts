@@ -1,3 +1,4 @@
+import { Track } from "./model/track"
 import { User } from "./model/user"
 
 export class ApiService {
@@ -79,7 +80,53 @@ export class PlaylistRepository extends Repository {
     return this._apiService.getPrimitive<number>(this.toFullPath(`get_playlist_size_by_id?id=${id}`))
   }
 
+  addTracksToPlaylist(playlistId: number, selectedTracks: number[]): Promise<void> {
+    return this._apiService.call(this.toFullPath(`add_tracks_to_playlist`), { playlistId, selectedTracks })
+  }
+
+  createPlaylist(title: string, selectedTracks: number[]): Promise<void> {
+    return this._apiService.call(this.toFullPath(`create_playlist`), { title, selectedTracks })
+  }
+
 }
+
+export class TrackRepository extends Repository {
+
+  constructor() {
+    super("track")
+  }
+
+  createTrack(track: Track): Promise<void> {
+    return this._apiService.call(this.toFullPath(`create_track`), track)
+  }
+
+  getAllTracksSorted(): Promise<Track[]> {
+    return this._apiService.getList<Track>(Track, this.toFullPath(`get_all_tracks_sorted`))
+  }
+
+  getPlaylistTracksGroup(offset: number, playlistId: number): Promise<Track[]> {
+    return this._apiService.getList<Track>(
+      Track,
+      this.toFullPath(`get_playlist_tracks_group?offset=${offset}&playlistId=${playlistId}`)
+    )
+  }
+
+  getAllNotInPlaylist(userId: number, playlistId: number): Promise<Track[]> {
+    return this._apiService.getList<Track>(
+      Track,
+      this.toFullPath(`get_all_not_in_playlist?userId=${userId}&playlistId=${playlistId}`)
+    )
+  }
+
+  getAllTracksNotInPlaylist(playlistId: number): Promise<Track[]> {
+    return this._apiService.getList<Track>(
+      Track,
+      this.toFullPath(`get_playlist_tracks_group?playlistId=${playlistId}`)
+    )
+  }
+
+}
+
 export class UserRepository extends Repository {
 
   constructor() {

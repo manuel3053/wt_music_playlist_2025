@@ -56,28 +56,10 @@ public class PlaylistController {
         }
     }
 
-    @GetMapping("/get_all_not_in_playlist")
-    public void getAllNotInPlaylist(@RequestParam(name = "userId") Integer userId, @RequestParam(name = "playlistId") Integer playlistId) {
-        try {
-            trackDAO.getAllNotInPlaylist(userId, playlistId);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-        }
-    }
-
     @GetMapping("/get_playlist_size_by_id")
     public Integer getPlaylistSizeById(@RequestParam(name = "id") Integer id) {
         try {
             return playlistTracksDAO.getAllByPlaylistId(id, UserDetailsExtractor.getUserId()).size();
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-        }
-    }
-
-    @GetMapping("/get_playlist_tracks_group")
-    public List<Track> getPlaylistTracksGroup(@RequestParam(name = "id") Integer id, @RequestParam(name = "offset") Integer offset) {
-        try {
-            return trackDAO.getPlaylistTracksGroup(id, offset * 5, UserDetailsExtractor.getUserId());
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
         }
