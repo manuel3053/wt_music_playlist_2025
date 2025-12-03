@@ -1,16 +1,37 @@
 import { AuthRepository, ErrorResponse } from "./api.service.js"
 import { Component } from "./component.js"
+import { Header } from "./header.js";
 import { HomePage } from "./homepage.js"
 
 export class App {
   private _authCaller: AuthRepository = new AuthRepository()
   private _currentPage: Component | undefined;
+  private _history: Component[] = [];
 
   constructor() {
     this.currentPage = new HomePage(this)
+    const headerComponent = new Header(this)
+    const header = document.getElementById("header")
+    header!.innerHTML = headerComponent.template
+    headerComponent.build()
   }
 
   public set currentPage(page: Component) {
+    if (this._currentPage != undefined) {
+      this._history.push(this._currentPage)
+    }
+    this._currentPage = page;
+    this.buildPage(page)
+  }
+
+  public pop() {
+    if (this._history.length != 0) {
+      const page = this._history.pop()!
+      this.buildPage(page)
+    }
+  }
+
+  private buildPage(page: Component) {
     const app: HTMLElement = document.getElementById("app")!
     app.innerHTML = page.template
     const style: HTMLElement = document.getElementById("current-page-style")!
