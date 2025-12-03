@@ -180,14 +180,12 @@ export class AuthRepository extends ApiRepository {
     return this._apiService.submit(this.toFullPath("login"), form)
   }
 
-  test(): Promise<User> {
-    return this._apiService.get<User>(User, this.toFullPath("test"))
+  logout(): Promise<void> {
+    return this._apiService.call(this.toFullPath("logout"), {})
   }
 
-  async csrf(): Promise<string> {
-    const token = await this._apiService.getPrimitive<string>(this.toFullPath("csrf"))
-    console.log(token)
-    return token
+  test(): Promise<User> {
+    return this._apiService.get<User>(User, this.toFullPath("test"))
   }
 
   testone(): Promise<User> {

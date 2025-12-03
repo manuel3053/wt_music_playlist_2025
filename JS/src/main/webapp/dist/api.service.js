@@ -151,15 +151,11 @@ export class AuthRepository extends ApiRepository {
     login(form) {
         return this._apiService.submit(this.toFullPath("login"), form);
     }
+    logout() {
+        return this._apiService.call(this.toFullPath("logout"), {});
+    }
     test() {
         return this._apiService.get(User, this.toFullPath("test"));
-    }
-    csrf() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const token = yield this._apiService.getPrimitive(this.toFullPath("csrf"));
-            console.log(token);
-            return token;
-        });
     }
     testone() {
         return this._apiService.get(User, this.toFullPath("testone"));

@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -46,6 +47,11 @@ public class AuthController {
         securityContextRepository.saveContext(context, request, response);
     }
 
+//    @PostMapping("/logout")
+//    public void logout(SecurityContextLogoutHandler securityContextLogoutHandler, Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+//        securityContextLogoutHandler.logout(request, response, authentication);
+//    }
+
     @PostMapping("/subscribe")
     public void subscribe(@RequestBody SubscribeRequest body) {
         try {
@@ -53,22 +59,6 @@ public class AuthController {
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @GetMapping("/csrf")
-    public String csrf(CsrfToken token) {
-        System.out.println(token);
-        return token.getHeaderName();
-    }
-
-    @GetMapping("/test")
-    public User test() {
-        return userDAO.findByUsername("s");
-    }
-
-    @GetMapping("/testone")
-    public User testone() {
-        return userDAO.findByUsername("s");
     }
 
 }
