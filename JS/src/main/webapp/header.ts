@@ -9,12 +9,17 @@ export class Header implements Component {
   }
 
   get css(): string {
-    return ""
+    return `
+    .header {
+      display: flex;
+    }
+    `
   }
 
   get template(): string {
     return `
-    <button id="prev_page" class="link-button">Prev<button/>
+    <div id="prev_page" class="link-button">Prev</div>
+    <div id="logout" class="link-button"/>Logout</div>
     `
   }
 

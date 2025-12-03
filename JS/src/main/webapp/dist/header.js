@@ -3,11 +3,16 @@ export class Header {
         this.context = context;
     }
     get css() {
-        return "";
+        return `
+    .header {
+      display: flex;
+    }
+    `;
     }
     get template() {
         return `
-    <button id="prev_page" class="link-button">Prev<button/>
+    <div id="prev_page" class="link-button">Prev</div>
+    <div id="logout" class="link-button"/>Logout</div>
     `;
     }
     build() {

@@ -17,17 +17,15 @@ export class App {
   }
 
   public set currentPage(page: Component) {
-    if (this._currentPage != undefined) {
-      this._history.push(this._currentPage)
-    }
+    this._history.push(page)
     this._currentPage = page;
     this.buildPage(page)
   }
 
   public pop() {
     if (this._history.length != 0) {
-      const page = this._history.pop()!
-      this.buildPage(page)
+      this._history.pop()!
+      this.buildPage(this._history[this._history.length - 1])
     }
   }
 
