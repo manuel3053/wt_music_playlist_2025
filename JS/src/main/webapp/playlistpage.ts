@@ -1,0 +1,161 @@
+import { PlaylistRepository, TrackRepository } from "./api.service.js"
+import { App } from "./app.js"
+import { Component } from "./component.js"
+import { TrackPage } from "./trackpage.js"
+
+export class PlaylistPage implements Component {
+  private context: App
+  private playlistId: number
+  private _trackRepository = new TrackRepository()
+  private _playlistRepository = new PlaylistRepository()
+
+  constructor(context: App, playlistId: number) {
+    this.context = context
+    this.playlistId = playlistId
+  }
+
+  get css(): string {
+    return `
+    .playlist {
+        display: grid;
+        height: 100vh;
+        width: 100vw;
+        grid-template-columns: 1fr;
+        grid-template-rows: 2fr 1fr;
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+    }
+
+    .carousel {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr;
+        width: 100%;
+        text-align: center;
+        align-items: center;
+    }
+
+    .link-button {
+        grid-column: span 1;
+    }
+
+    .link-button:hover {
+        grid-column: span 1;
+    }
+    `
+  }
+
+  get template(): string {
+    return `
+    <div class = "playlist">
+        <div id="carousel" class="carousel">
+        </div>
+        <form id="load-tracks" method="post" class="form">
+            <div class="form-tracks-list">
+                <div class="form-tracks-list-body">
+                    <div></div>
+                    <div>Track title</div>
+                    <div>Track album</div>
+                </div>
+                <div class="form-tracks-list-body" id="form-tracks-list-body"></div>
+            </div>
+            <input class="form-button" type="submit"/>
+        </form>
+    </div>
+    `
+  }
+
+  private getTracksNotInPlaylist(): void {
+    this._trackRepository.getAllTracksNotInPlaylist(this.playlistId).then(tracks => {
+      const list = document.getElementById("form-tracks-list-body")!
+      list.innerHTML = ""
+      tracks.forEach(t => {
+        const input: HTMLInputElement = document.createElement("input")
+        input.type = "checkbox"
+        input.name = "selectedTracks"
+        input.value = t.id.toString()
+        list.append(input)
+        const title: HTMLDivElement = document.createElement("div")
+        title.innerText = t.title
+        list.append(title)
+        const album: HTMLDivElement = document.createElement("div")
+        album.innerText = t.albumTitle
+        list.append(album)
+      })
+    })
+  }
+
+  private getTracksInCarousel(index: number): void {
+    this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+      const carousel = document.getElementById("carousel")!
+      carousel.innerHTML = ""
+      const placeholder: HTMLDivElement = document.createElement("div")
+
+      if (index > 0) {
+        const prev: HTMLButtonElement = document.createElement("button")
+        prev.className = "link-button"
+        prev.textContent = "Prev"
+        prev.addEventListener(
+          "click",
+          () => this.getTracksInCarousel.bind(this)(index - 1)
+        )
+        carousel.append(prev)
+      } else {
+        carousel.append(placeholder)
+      }
+
+      tracks.slice(index * 5, index * 5 + 5).forEach(t => {
+        const cell: HTMLDivElement = document.createElement("div")
+        cell.className = "carousel-cell"
+        const cover: HTMLImageElement = document.createElement("img")
+        cover.className = "track-cover"
+        cover.src = `/file/${t.imagePath}`
+        const title: HTMLButtonElement = document.createElement("button")
+        title.className = "link-button"
+        title.textContent = t.title.toString()
+        title.addEventListener(
+          "click",
+          () => this.context.currentPage = new TrackPage(this.context, t.id)
+        )
+        cell.append(cover)
+        cell.append(title)
+        carousel.append(cell)
+      })
+
+      if (tracks.length > 5 && (index + 1) * 5 < tracks.length) {
+        const next: HTMLButtonElement = document.createElement("button")
+        next.className = "link-button"
+        next.textContent = "Next"
+        next.addEventListener(
+          "click",
+          () => this.getTracksInCarousel.bind(this)(index + 1)
+        )
+        carousel.append(next)
+      } else {
+        carousel.append(placeholder)
+      }
+
+    })
+  }
+
+  build(): void {
+    this.getTracksNotInPlaylist()
+    this.getTracksInCarousel(0)
+
+    const playlistForm = document.getElementById("load-tracks") as HTMLFormElement
+    playlistForm.addEventListener('submit', (event) => {
+      event.preventDefault()
+      const formData = new FormData(playlistForm)
+      playlistForm.reset()
+      this._playlistRepository.addTracksToPlaylist(formData)
+        .then(() => {
+          this.getTracksNotInPlaylist.bind(this)()
+          this.getTracksInCarousel.bind(this)(0)
+        })
+        .catch(() => alert("Failed to load playlist"))
+    });
+
+  }
+
+}

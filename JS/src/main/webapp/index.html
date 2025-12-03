@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+    <script src="dist/login.js" type="module" defer></script>
+    <script src="dist/api.service.js" type="module" defer></script>
+    <script src="dist/model/user.js" type="module" defer></script>
+    <title>Login</title>
+    <style id="login-style"></style>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/login.css">
+  </head>
+  <body>
+    <div class = "login">
+      <form class="form" id="form">
+        <label class="form-field-name">Name</label>
+        <input class="form-field" name="username" type="text" autocomplete="username" placeholder="Username" required>
+        <label class="form-field-name">Password</label>
+        <input class="form-field" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+        <input id="submit" class="form-button" type="submit" value="Login"/>
+        <a class="subscribe-link">Not subscribed?</a>
+      </form>
+    </div>
+  </body>
+</html>

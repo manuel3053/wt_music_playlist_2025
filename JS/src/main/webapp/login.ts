@@ -1,26 +1,21 @@
-import { ApiRepository, PlaylistRepository, UserRepository } from "./api.service"
-import { User } from "./model/user"
-import "./static/style.css"
+import { AuthRepository } from "./api.service.js"
 
 class Login {
-  private _userRepository: UserRepository = new UserRepository()
-  private _playlistRepository: PlaylistRepository = new PlaylistRepository()
+  private _authRepository: AuthRepository = new AuthRepository()
 
   constructor() {
-    document.getElementById("test-button")?.addEventListener(
-      "click",
-      () => {
-        let user: User = new User()
-        user.name = "nuovo"
-        user.surname = "nuovo"
-        user.username = "nuovo"
-        user.password = "nuovo"
-        this._playlistRepository.getPlaylistSizeById(6).then(size => console.log(size))
-        this._userRepository.login("s", "s").then(user => {
-          document.getElementById("test-button")!.innerText = user.username
-        })
-      }
-    )
+
+    const form = document.getElementById("form") as HTMLFormElement
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      const formData = new FormData(form)
+      form.reset()
+      this._authRepository.login(formData)
+        .then(() => window.location.href = "app.html")
+        .catch(() => alert("Login fallito"))
+    });
+
   }
 
 }

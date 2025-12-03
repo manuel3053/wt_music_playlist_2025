@@ -1,5 +1,6 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
+import it.polimi.tiw.wt_music_playlist_2025.security.UserWithId;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class UserDetailsExtractor {

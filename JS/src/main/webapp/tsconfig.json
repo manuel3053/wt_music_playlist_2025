@@ -1,13 +1,14 @@
 {
-    "compilerOptions": {
-        "target": "ES6",
-        "module": "ESNext",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "outDir": "./dist"
-    },
-    "include": [
-        "."
-    ]
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "."
+  ]
 }

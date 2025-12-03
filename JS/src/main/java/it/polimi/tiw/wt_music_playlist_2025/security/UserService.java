@@ -1,4 +1,4 @@
-package it.polimi.tiw.wt_music_playlist_2025.controller;
+package it.polimi.tiw.wt_music_playlist_2025.security;
 
 import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
 import org.springframework.security.core.userdetails.UserDetails;

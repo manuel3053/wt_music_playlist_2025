@@ -4,10 +4,12 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
+@Transactional
 public interface PlaylistTracksDAO extends JpaRepository<PlaylistTracks, Integer> {
     PlaylistTracks save(PlaylistTracks playlistTracks);
 

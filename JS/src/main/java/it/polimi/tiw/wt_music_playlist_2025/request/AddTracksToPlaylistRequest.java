@@ -9,15 +9,6 @@ public class AddTracksToPlaylistRequest {
     private Integer playlistId;
     private List<Integer> selectedTracks = new ArrayList<>();
 
-    public List<PlaylistTracks> toPlaylistTracks() {
-        return selectedTracks.stream().map((trackId) -> {
-            PlaylistTracks p = new PlaylistTracks();
-            p.setPlaylistId(playlistId);
-            p.setTrackId(trackId);
-            return p;
-        }).toList();
-    }
-
     public Integer getPlaylistId() {
         return playlistId;
     }
@@ -32,5 +23,14 @@ public class AddTracksToPlaylistRequest {
 
     public void setSelectedTracks(List<Integer> selectedTracks) {
         this.selectedTracks = selectedTracks;
+    }
+
+    public List<PlaylistTracks> toTracks() {
+        return selectedTracks.stream().map((trackId) -> {
+            PlaylistTracks p = new PlaylistTracks();
+            p.setPlaylistId(playlistId);
+            p.setTrackId(trackId);
+            return p;
+        }).toList();
     }
 }

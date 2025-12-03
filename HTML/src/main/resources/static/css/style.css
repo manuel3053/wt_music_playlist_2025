@@ -53,6 +53,20 @@ option:hover {
     padding: 0;
 }
 
+.form {
+    & .label {
+        display: flex;
+        padding: var(--padding);
+        margin: var(--margin);
+    }
+}
+
+.div {
+    & .label {
+        margin: var(--margin);
+    }
+}
+
 .form-field, .form-field-name, .form-field-file {
     display: flex;
     padding: var(--padding);

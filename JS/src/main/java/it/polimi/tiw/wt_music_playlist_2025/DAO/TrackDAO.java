@@ -45,4 +45,12 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
     )
     List<Track> getAllNotInPlaylist(int userId, int playlistId);
 
+    @NativeQuery(
+            value = "select t.* " +
+                    "from track t join playlist_tracks pt on t.id = pt.track_id " +
+                    "where t.loader_id = ?1 and pt.playlist_id = ?2 " +
+                    "order by author asc, album_publication_year asc, id asc"
+    )
+    List<Track> getAllInPlaylist(int userId, int playlistId);
+
 }

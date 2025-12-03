@@ -4,65 +4,72 @@ import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
+import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.request.*;
+import it.polimi.tiw.wt_music_playlist_2025.request.AddPlaylistRequest;
+import it.polimi.tiw.wt_music_playlist_2025.request.AddTracksToPlaylistRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/playlist")
 public class PlaylistController {
     private final TrackDAO trackDAO;
     private final PlaylistDAO playlistDAO;
     private final PlaylistTracksDAO playlistTracksDAO;
 
-    public PlaylistController(TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO, PlaylistDAO playlistDAO) {
+    public PlaylistController(TrackDAO trackDAO, PlaylistDAO playlistDAO, PlaylistTracksDAO playlistTracksDAO) {
         this.trackDAO = trackDAO;
-        this.playlistTracksDAO = playlistTracksDAO;
         this.playlistDAO = playlistDAO;
+        this.playlistTracksDAO = playlistTracksDAO;
     }
 
-    private void checkTracks(List<Integer> tracks) {
-        int userId = UserDetailsExtractor.getUserId();
-        for (Integer id : tracks) {
-            if (trackDAO.findTrackByIdAndLoaderId(id, userId) == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "You don't own this track");
-            }
-        }
+    @GetMapping("/get_playlists")
+    public List<Playlist> getPlaylists() {
+        return playlistDAO.findByAuthorIdOrderByCreationDateAsc(UserDetailsExtractor.getUserId());
     }
 
-    @PostMapping(value = "/create_playlist", consumes = "application/json")
-    public void createPlaylist(@RequestBody CreatePlaylistRequest createPlaylistRequest) {
+    @GetMapping("/get_playlist_size_by_id/{id}")
+    public int getPlaylistSizeByid(@PathVariable("id") int id) {
+        return playlistTracksDAO.getAllByPlaylistId(id, UserDetailsExtractor.getUserId()).size();
+    }
+
+    @PostMapping("/add_playlist")
+    public void addPlaylist(
+            @RequestParam("title") String title,
+            @RequestParam("selected_tracks") List<Integer> selectedTracks
+    ) {
+        Playlist insertedPlaylist;
         try {
-            checkTracks(createPlaylistRequest.getSelectedTracks());
-            Playlist insertedPlaylist = playlistDAO.save(createPlaylistRequest.toPlaylist(UserDetailsExtractor.getUserId()));
-            playlistTracksDAO.saveAll(createPlaylistRequest.toPlaylistTracks(insertedPlaylist.getId()));
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
+            int userId = UserDetailsExtractor.getUserId();
+            Playlist playlist = new Playlist();
+            playlist.setTitle(title);
+            playlist.setAuthorId(userId);
+            playlist.setCustomOrder(false);
+            playlist.setCreationDate(new Date(System.currentTimeMillis()));
+            insertedPlaylist = playlistDAO.save(playlist);
+
+            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+                    .map(Track::getId).toList();
+            playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
+                if (userTracks.contains(trackId)) {
+                    PlaylistTracks p = new PlaylistTracks();
+                    p.setPlaylistId(insertedPlaylist.getId());
+                    p.setTrackId(trackId);
+                    return p;
+                } else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }).toList());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping(value = "/add_tracks_to_playlist", consumes = "application/json")
-    public void addTracksToPlaylist(@RequestBody AddTracksToPlaylistRequest addTracksToPlaylistRequest) {
-        try {
-            checkTracks(addTracksToPlaylistRequest.getSelectedTracks());
-            playlistTracksDAO.saveAll(addTracksToPlaylistRequest.toPlaylistTracks());
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-        }
-    }
-
-    @GetMapping("/get_playlist_size_by_id")
-    public Integer getPlaylistSizeById(@RequestParam(name = "id") Integer id) {
-        try {
-            return playlistTracksDAO.getAllByPlaylistId(id, UserDetailsExtractor.getUserId()).size();
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-        }
-    }
 
 }

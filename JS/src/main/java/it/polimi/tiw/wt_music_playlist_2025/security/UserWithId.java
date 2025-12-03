@@ -1,4 +1,4 @@
-package it.polimi.tiw.wt_music_playlist_2025.controller;
+package it.polimi.tiw.wt_music_playlist_2025.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
