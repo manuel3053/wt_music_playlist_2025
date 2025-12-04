@@ -1,6 +1,7 @@
 import { AuthRepository, ErrorResponse, PlaylistRepository, TrackRepository } from "./api.service.js"
 import { App } from "./app.js"
 import { Component } from "./component.js"
+import { Modal } from "./modal.js"
 import { PlaylistPage } from "./playlistpage.js"
 
 export class HomePage implements Component {
@@ -8,6 +9,7 @@ export class HomePage implements Component {
   private _authCaller = new AuthRepository()
   private _trackRepository = new TrackRepository()
   private _playlistRepository = new PlaylistRepository()
+  private _modal: Modal | undefined
 
   constructor(context: App) {
     this.context = context
@@ -35,15 +37,29 @@ export class HomePage implements Component {
           align-items: center;
           justify-content: center;
       }
+
+      .modal-area {
+        position: absolute;
+        visibility: hidden;
+        top: 30vh;
+        left: 40vw;
+        min-width: 30vw;
+        min-height: 10vh;
+        background-color: black;
+        border: 2px solid yellow;
+        border-radius: var(--border-radius);
+      }
     `
   }
 
   get template(): string {
     return `
+    <div class="modal-area" id="modal-area"></div>
     <div class="home">
       <div class="playlist-list">
           <div "class="form-playlist-list">
               <div class="playlist-list-body">
+                  <div>Sort</div>
                   <div>Track title</div>
                   <div>Track album</div>
               </div>
@@ -95,7 +111,7 @@ export class HomePage implements Component {
       tracks.forEach(t => {
         const input: HTMLInputElement = document.createElement("input")
         input.type = "checkbox"
-        input.name = "selectedTracks"
+        input.name = "selected_tracks"
         input.value = t.id.toString()
         list.append(input)
         const title: HTMLDivElement = document.createElement("div")
@@ -113,6 +129,30 @@ export class HomePage implements Component {
       const list = document.getElementById("playlist-list-body")!
       list.innerHTML = ""
       playlists.forEach(p => {
+        const sort: HTMLButtonElement = document.createElement("button")
+        sort.className = "link-button"
+        sort.textContent = "Sort"
+        sort.addEventListener(
+          "click",
+          () => {
+            const modalArea = document.getElementById("modal-area")
+            if (this._modal === undefined) {
+              this._modal = new Modal(this.context, p.id)
+              modalArea!.innerHTML = this._modal.template
+              this._modal.build()
+              sort.textContent = "Close"
+              modalArea!.style.visibility = "visible"
+            } else {
+              modalArea!.innerHTML = ""
+              this._modal.save()
+              this._modal = undefined
+              sort.textContent = "Sort"
+              modalArea!.style.visibility = "hidden"
+            }
+
+          }
+        )
+        list.append(sort)
         const title: HTMLButtonElement = document.createElement("button")
         title.className = "link-button"
         title.textContent = p.title.toString()

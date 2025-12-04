@@ -50,7 +50,9 @@ public class TrackController {
 
     @GetMapping("/get_all_in_playlist/{id}")
     public List<Track> getAllInPlaylist(@PathVariable("id") int id) {
-        return trackDAO.getAllInPlaylist(UserDetailsExtractor.getUserId(), id);
+        List<Track> tracks = trackDAO.getAllInPlaylist(UserDetailsExtractor.getUserId(), id);
+        System.out.println(tracks.size());
+        return tracks;
     }
 
     @GetMapping("/get_genres")

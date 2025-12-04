@@ -73,7 +73,7 @@ export class PlaylistPage implements Component {
       tracks.forEach(t => {
         const input: HTMLInputElement = document.createElement("input")
         input.type = "checkbox"
-        input.name = "selectedTracks"
+        input.name = "selected_tracks"
         input.value = t.id.toString()
         list.append(input)
         const title: HTMLDivElement = document.createElement("div")
@@ -147,6 +147,7 @@ export class PlaylistPage implements Component {
     playlistForm.addEventListener('submit', (event) => {
       event.preventDefault()
       const formData = new FormData(playlistForm)
+      formData.append("playlist_id", this.playlistId.toString())
       playlistForm.reset()
       this._playlistRepository.addTracksToPlaylist(formData)
         .then(() => {

@@ -71,5 +71,28 @@ public class PlaylistController {
         }
     }
 
+    @PostMapping("/add_tracks_to_playlist")
+    public void addPlaylist(
+            @RequestParam("playlist_id") Integer playlistId,
+            @RequestParam("selected_tracks") List<Integer> selectedTracks
+    ) {
+        try {
+            int userId = UserDetailsExtractor.getUserId();
+            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+                    .map(Track::getId).toList();
+            playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
+                if (userTracks.contains(trackId)) {
+                    PlaylistTracks p = new PlaylistTracks();
+                    p.setPlaylistId(playlistId);
+                    p.setTrackId(trackId);
+                    return p;
+                } else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }).toList());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

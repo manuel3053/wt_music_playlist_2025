@@ -145,5 +145,5 @@ option:hover {
 }
 
 .playlist-list-body {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
 }
