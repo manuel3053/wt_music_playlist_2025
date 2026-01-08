@@ -1,13 +1,12 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
+import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Genre;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,12 +25,14 @@ public class TrackController {
 
     @Value("${db.mediaPath}")
     private String mediaPath;
+    private final TrackDAO trackDAO;
+    private final PlaylistDAO playlistDAO;
 
-    public TrackController(TrackDAO trackDAO) {
+    public TrackController(TrackDAO trackDAO, PlaylistDAO playlistDAO) {
         this.trackDAO = trackDAO;
+        this.playlistDAO = playlistDAO;
     }
 
-    private final TrackDAO trackDAO;
 
     @GetMapping("/get_track_by_id/{id}")
     public Track getTrackById(@PathVariable("id") int id) {
@@ -50,9 +51,15 @@ public class TrackController {
 
     @GetMapping("/get_all_in_playlist/{id}")
     public List<Track> getAllInPlaylist(@PathVariable("id") int id) {
-        List<Track> tracks = trackDAO.getAllInPlaylist(UserDetailsExtractor.getUserId(), id);
-        System.out.println(tracks.size());
-        return tracks;
+        Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), id);
+        if (playlist == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        if (playlist.getCustomOrder()) {
+            return trackDAO.getAllInPlaylistCustom(UserDetailsExtractor.getUserId(), id);
+        } else {
+            return trackDAO.getAllInPlaylist(UserDetailsExtractor.getUserId(), id);
+        }
     }
 
     @GetMapping("/get_genres")

@@ -21,13 +21,8 @@ export class ErrorResponse {
 
 export class ApiService {
 
-  private buildHeaders(): Headers {
-    const headers: Headers = new Headers()
-    return headers
-  }
-
   private createRequest(address: string, body?: {}): Request {
-    const headers: Headers = this.buildHeaders()
+    const headers: Headers = new Headers()
     headers.set('Content-Type', 'application/json')
 
     return body === undefined
@@ -115,10 +110,6 @@ export class ApiRepository {
 
 export class PlaylistRepository extends ApiRepository {
 
-  getPlaylistSizeById(id: number): Promise<number> {
-    return this._apiService.getPrimitive<number>(this.toFullPath(`get_playlist_size_by_id?id=${id}`))
-  }
-
   addTracksToPlaylist(form: FormData): Promise<void> {
     return this._apiService.submit(this.toFullPath(`add_tracks_to_playlist`), form)
   }
@@ -131,6 +122,11 @@ export class PlaylistRepository extends ApiRepository {
     return this._apiService.getList<Playlist>(Playlist, this.toFullPath("get_playlists"))
   }
 
+  setCustomOrder(form: FormData): Promise<void> {
+    return this._apiService.submit(this.toFullPath("get_playlists"), form)
+  }
+
+
 
 }
 
@@ -138,10 +134,6 @@ export class TrackRepository extends ApiRepository {
 
   createTrack(form: FormData): Promise<void> {
     return this._apiService.submit(this.toFullPath(`add_track`), form)
-  }
-
-  getAllTracksSorted(): Promise<Track[]> {
-    return this._apiService.getList<Track>(Track, this.toFullPath(`get_all_tracks_sorted`))
   }
 
   getTrackById(trackId: number): Promise<Track> {
@@ -182,14 +174,6 @@ export class AuthRepository extends ApiRepository {
 
   logout(): Promise<void> {
     return this._apiService.call(this.toFullPath("logout"), {})
-  }
-
-  test(): Promise<User> {
-    return this._apiService.get<User>(User, this.toFullPath("test"))
-  }
-
-  testone(): Promise<User> {
-    return this._apiService.get<User>(User, this.toFullPath("testone"))
   }
 
   subscribe(form: FormData): Promise<void> {

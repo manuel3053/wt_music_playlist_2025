@@ -4,16 +4,20 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface TrackDAO extends JpaRepository<Track, Integer> {
 
+    @Transactional
     Track save(Track track);
 
+    @Transactional
     Track findTrackByIdAndLoaderId(int id, int loaderId);
 
+    @Transactional
     @NativeQuery(
             value = "select * " +
                     "from track " +
@@ -22,6 +26,7 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
     )
     List<Track> getAllByUserIdSorted(int userId);
 
+    @Transactional
     @NativeQuery(
             value = "select t.* " +
                     "from track t join playlist_tracks pt on t.id = pt.track_id " +
@@ -32,6 +37,7 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
     )
     List<Track> getPlaylistTracksGroup(int playlistId, int offset, int userId);
 
+    @Transactional
     @NativeQuery(
             value = "select t.* " +
                     "from track t join user u on t.loader_id = u.id " +
@@ -45,12 +51,37 @@ public interface TrackDAO extends JpaRepository<Track, Integer> {
     )
     List<Track> getAllNotInPlaylist(int userId, int playlistId);
 
+    @Transactional
     @NativeQuery(
-            value = "select t.* " +
-                    "from track t join playlist_tracks pt on t.id = pt.track_id " +
-                    "where t.loader_id = ?1 and pt.playlist_id = ?2 " +
-                    "order by author asc, album_publication_year asc, id asc"
+            value = """
+                    select t.*
+                    from track t join playlist_tracks pt on t.id = pt.track_id join playlist p on p.id = pt.playlist_id  
+                    where t.loader_id = ?1 and pt.playlist_id = ?2  
+                    order by t.author asc, t.album_publication_year asc, t.id asc  
+                    """
     )
     List<Track> getAllInPlaylist(int userId, int playlistId);
+
+    @Transactional
+    @NativeQuery(
+            value = """
+                    select t.*
+                    from track t join playlist_tracks pt on t.id = pt.track_id join playlist p on p.id = pt.playlist_id  
+                    where t.loader_id = ?1 and pt.playlist_id = ?2  
+                    order by t.position
+                    """
+    )
+    List<Track> getAllInPlaylistCustom(int userId, int playlistId);
+
+    @Transactional
+    @NativeQuery(
+            value = """
+                    update track
+                    set position = ?1
+                    where id = ?1
+                    """
+    )
+    void updatePosition(int position, int id);
+
 
 }

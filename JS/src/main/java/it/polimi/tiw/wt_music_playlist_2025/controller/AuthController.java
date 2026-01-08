@@ -2,7 +2,6 @@ package it.polimi.tiw.wt_music_playlist_2025.controller;
 
 import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.User;
-import it.polimi.tiw.wt_music_playlist_2025.request.SubscribeRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -47,15 +46,20 @@ public class AuthController {
         securityContextRepository.saveContext(context, request, response);
     }
 
-//    @PostMapping("/logout")
-//    public void logout(SecurityContextLogoutHandler securityContextLogoutHandler, Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-//        securityContextLogoutHandler.logout(request, response, authentication);
-//    }
-
     @PostMapping("/subscribe")
-    public void subscribe(@RequestBody SubscribeRequest body) {
+    public void subscribe(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("name") String name,
+            @RequestParam("surname") String surname
+    ) {
         try {
-            userDAO.save(body.toUser());
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setName(name);
+            user.setSurname(surname);
+            userDAO.save(user);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }

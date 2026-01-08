@@ -16,48 +16,43 @@ export class Modal {
     `;
     }
     save() {
+        // se delle tracce sono state spostate:
+        // - segna la playlist con custom_order
+        // - segna nelle tracce la posizione
     }
     build() {
         this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
             const modal = document.getElementById("modal");
             modal.innerHTML = "";
-            console.log(tracks);
-            tracks.forEach(t => {
+            tracks.forEach((t, index) => {
                 const title = document.createElement("div");
                 title.textContent = t.title;
+                title.className = "draggable";
+                title.setAttribute('position', index.toString());
                 title.draggable = true;
-                title.addEventListener("dragstart", this.dragStart);
-                title.addEventListener("dragover", this.dragOver);
-                title.addEventListener("dragleave", this.dragLeave);
-                title.addEventListener("drop", this.drop);
+                title.addEventListener("dragstart", this.dragStart.bind(this));
+                title.addEventListener("dragover", this.dragOver.bind(this));
+                title.addEventListener("drop", this.drop.bind(this));
                 modal.append(title);
             });
         });
     }
-    dragStart(event) {
-        let list_item = event.target;
-        list_item.style.cursor = "pointer"; // or convert to a proper class
-        this.startElement = list_item;
+    dragStart(e) {
+        this.start = e.target.closest(".draggable");
     }
-    dragOver(event) {
-        event.preventDefault();
-        let list_item = event.target;
-        list_item.style.cursor = "grab";
+    dragOver(e) {
+        e.preventDefault();
     }
-    dragLeave(event) {
-        let list_item = event.target;
-        list_item.style.cursor = "pointer";
-    }
-    drop(event) {
-        let finalDest = event.target;
-        let completeList = finalDest.closest("div");
-        let songsArray = Array.from(completeList.querySelectorAll("div"));
-        let indexDest = songsArray.indexOf(finalDest);
-        if (songsArray.indexOf(this.startElement) < indexDest) {
-            this.startElement.parentElement.insertBefore(this.startElement, songsArray[indexDest + 1]);
+    drop(e) {
+        this.dest = e.target.closest(".draggable");
+        const modal = document.getElementById("modal");
+        const list = Array.from(modal.querySelectorAll(".draggable"));
+        const position = list.indexOf(this.dest);
+        if (list.indexOf(this.start) < position) {
+            this.start.parentElement.insertBefore(this.start, list[position + 1]);
         }
         else {
-            this.startElement.parentElement.insertBefore(this.startElement, songsArray[indexDest]);
+            this.start.parentElement.insertBefore(this.start, list[position]);
         }
     }
 }

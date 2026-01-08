@@ -6,8 +6,6 @@ import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.request.AddPlaylistRequest;
-import it.polimi.tiw.wt_music_playlist_2025.request.AddTracksToPlaylistRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -76,8 +74,20 @@ public class PlaylistController {
             @RequestParam("playlist_id") Integer playlistId,
             @RequestParam("selected_tracks") List<Integer> selectedTracks
     ) {
+        int userId = UserDetailsExtractor.getUserId();
+        Playlist playlist = playlistDAO.findByAuthorIdAndId(userId, playlistId);
+        if (playlist == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        if (playlist.getCustomOrder()) {
+            int lastPosition = trackDAO.getAllInPlaylist(userId, playlistId).size() - 1;
+            for (int i = 0; i < selectedTracks.size(); i++) {
+                trackDAO.updatePosition(lastPosition + i, selectedTracks.get(i));
+            }
+        }
+
         try {
-            int userId = UserDetailsExtractor.getUserId();
             List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
                     .map(Track::getId).toList();
             playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
@@ -90,9 +100,37 @@ public class PlaylistController {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN);
                 }
             }).toList());
+
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @PostMapping("/set_custom_order")
+    public void setCustomOrder(
+            @RequestParam("playlist_id") Integer playlistId,
+            @RequestParam("tracks") List<Integer> tracks
+    ) {
+        Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), playlistId);
+        if (playlist == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        try {
+            int userId = UserDetailsExtractor.getUserId();
+            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+                    .map(Track::getId).toList();
+
+            playlistDAO.setCustomOrder(playlistId);
+            for (int i = 0; i < tracks.size(); i++) {
+                if (userTracks.contains(tracks.get(i))) {
+                    trackDAO.updatePosition(i, tracks.get(i));
+                } else {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

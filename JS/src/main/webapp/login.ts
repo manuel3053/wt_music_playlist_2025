@@ -16,6 +16,14 @@ class Login {
         .catch(() => alert("Login fallito"))
     });
 
+    const subscribe: HTMLDivElement = document.getElementById("subscribe") as HTMLDivElement
+    subscribe.addEventListener(
+      "click",
+      () => {
+      }
+    )
+
+
   }
 
 }

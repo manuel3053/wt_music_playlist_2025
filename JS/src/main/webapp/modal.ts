@@ -7,7 +7,11 @@ export class Modal implements Component {
   private context: App
   private playlistId: number
   private _trackRepository = new TrackRepository()
-  private startElement: HTMLDivElement | undefined;
+  private _playlistRepository = new PlaylistRepository()
+  private start: Element | undefined
+  private end: Element | undefined
+  private _orderChanged: boolean = false
+  private _sortedTracksIds: string[] = []
 
   constructor(context: App, playlistId: number) {
     this.context = context
@@ -27,63 +31,57 @@ export class Modal implements Component {
   }
 
   save(): void {
+    if (this._orderChanged) {
+      const formdData = new FormData()
+      formdData.append("playlist_id", this.playlistId.toString())
+      formdData.append("tracks", JSON.stringify(this._sortedTracksIds))
+      this._playlistRepository.setCustomOrder(formdData)
+    }
   }
 
   build(): void {
     this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
       const modal = document.getElementById("modal")!
       modal.innerHTML = ""
-      console.log(tracks);
-
       tracks.forEach(t => {
         const title: HTMLDivElement = document.createElement("div")
         title.textContent = t.title
+        title.className = "draggable"
         title.draggable = true
-        title.addEventListener("dragstart", this.dragStart);
-        title.addEventListener("dragover", this.dragOver);
-        title.addEventListener("dragleave", this.dragLeave);
-        title.addEventListener("drop", this.drop);
+        title.setAttribute("id", t.id.toString())
+        title.addEventListener("dragstart", this.dragStart.bind(this))
+        title.addEventListener("dragover", this.dragOver.bind(this))
+        title.addEventListener("drop", this.drop.bind(this))
         modal.append(title)
+        this._sortedTracksIds.push(t.id.toString())
       })
     })
   }
 
-  dragStart(event: Event) {
-    let list_item: HTMLDivElement = event.target as HTMLDivElement;
-    list_item.style.cursor = "pointer"; // or convert to a proper class
-    this.startElement = list_item;
+  private dragStart(e: DragEvent): void {
+    this.start = (e.target as HTMLElement).closest(".draggable")!
   }
 
-  dragOver(event: Event) {
-    event.preventDefault()
-    let list_item: HTMLDivElement = event.target as HTMLDivElement;
-    list_item.style.cursor = "grab";
+  private dragOver(e: DragEvent): void {
+    e.preventDefault()
   }
 
-  dragLeave(event: Event) {
-    let list_item: HTMLDivElement = event.target as HTMLDivElement;
-    list_item.style.cursor = "pointer";
-  }
-
-  drop(event: Event) {
-    let finalDest: HTMLDivElement = event.target as HTMLDivElement;
-
-    let completeList: HTMLDivElement = finalDest.closest("div")!;
-    let songsArray: HTMLDivElement[] = Array.from(completeList.querySelectorAll("div"));
-
-    let indexDest: number = songsArray.indexOf(finalDest);
-
-    if (songsArray.indexOf(this.startElement!) < indexDest) {
-      this.startElement!.parentElement!.insertBefore(
-        this.startElement!,
-        songsArray[indexDest + 1],
-      );
-    } else {
-      this.startElement!.parentElement!.insertBefore(
-        this.startElement!,
-        songsArray[indexDest],
-      );
+  private drop(e: DragEvent): void {
+    this.end = (e.target as HTMLElement).closest(".draggable")!
+    const modal = document.getElementById("modal")!
+    const list: Element[] = Array.from(modal.querySelectorAll(".draggable"))
+    const endPosition: number = list.indexOf(this.end)
+    const startPosition: number = list.indexOf(this.start!)
+    if (startPosition < endPosition) {
+      this.start!.parentElement!.insertBefore(this.start!, list[endPosition + 1])
     }
+    else {
+      this.start!.parentElement!.insertBefore(this.start!, list[endPosition])
+    }
+    const tmp = this._sortedTracksIds[startPosition]
+    this._sortedTracksIds[startPosition] = this.end!.getAttribute("id")!
+    this._sortedTracksIds[endPosition] = tmp
+    this._orderChanged = true
   }
 
 }
