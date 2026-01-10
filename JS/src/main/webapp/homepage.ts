@@ -1,4 +1,4 @@
-import { AuthRepository, ErrorResponse, PlaylistRepository, TrackRepository } from "./api.service.js"
+import { PlaylistRepository, TrackRepository } from "./api.service.js"
 import { App } from "./app.js"
 import { Component } from "./component.js"
 import { Modal } from "./modal.js"
@@ -6,7 +6,6 @@ import { PlaylistPage } from "./playlistpage.js"
 
 export class HomePage implements Component {
   private context: App
-  private _authCaller = new AuthRepository()
   private _trackRepository = new TrackRepository()
   private _playlistRepository = new PlaylistRepository()
   private _modal: Modal | undefined

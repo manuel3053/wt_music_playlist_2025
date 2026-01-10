@@ -4,7 +4,6 @@ import { Component } from "./component.js"
 
 
 export class Modal implements Component {
-  private context: App
   private playlistId: number
   private _trackRepository = new TrackRepository()
   private _playlistRepository = new PlaylistRepository()
@@ -14,7 +13,6 @@ export class Modal implements Component {
   private _sortedTracksIds: string[] = []
 
   constructor(context: App, playlistId: number) {
-    this.context = context
     this.playlistId = playlistId
   }
 

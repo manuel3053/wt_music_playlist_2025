@@ -1,6 +1,5 @@
 import { Playlist } from "./model/playlist.js"
 import { Track } from "./model/track.js"
-import { User } from "./model/user.js"
 
 export class ErrorResponse {
   private _response: Response

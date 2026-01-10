@@ -1,11 +1,8 @@
-import { AuthRepository, ErrorResponse } from "./api.service.js"
 import { Component } from "./component.js"
 import { Header } from "./header.js";
 import { HomePage } from "./homepage.js"
 
 export class App {
-  private _authCaller: AuthRepository = new AuthRepository()
-  private _currentPage: Component | undefined;
   private _history: Component[] = [];
 
   constructor() {
@@ -18,7 +15,6 @@ export class App {
 
   public set currentPage(page: Component) {
     this._history.push(page)
-    this._currentPage = page;
     this.buildPage(page)
   }
 
