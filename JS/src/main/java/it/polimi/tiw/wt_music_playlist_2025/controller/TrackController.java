@@ -1,16 +1,5 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Genre;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +8,22 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Genre;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 
 @RestController
 public class TrackController {
@@ -32,7 +37,6 @@ public class TrackController {
         this.trackDAO = trackDAO;
         this.playlistDAO = playlistDAO;
     }
-
 
     @GetMapping("/get_track_by_id/{id}")
     public Track getTrackById(@PathVariable("id") int id) {
@@ -67,7 +71,8 @@ public class TrackController {
         return Arrays.stream(Genre.values()).map(Enum::toString).toList();
     }
 
-    private void saveFile(MultipartFile file, String path, String type) throws IOException, InvalidFileType, NullPointerException {
+    private void saveFile(MultipartFile file, String path, String type)
+            throws IOException, InvalidFileType, NullPointerException {
         if (!file.getContentType().startsWith(type)) {
             throw new InvalidFileType("type");
         }
@@ -77,7 +82,8 @@ public class TrackController {
     }
 
     private String getPath(int userId, String albumTitle, MultipartFile file) {
-        return UserDetailsExtractor.getUserId() + File.separator + albumTitle + File.separator + file.getOriginalFilename();
+        return UserDetailsExtractor.getUserId() + File.separator + albumTitle + File.separator
+                + file.getOriginalFilename();
     }
 
     @PostMapping("/add_track")
@@ -88,8 +94,7 @@ public class TrackController {
             @RequestParam("author") String author,
             @RequestParam("album_title") String albumTitle,
             @RequestParam("album_publication_year") Integer albumPublicationYear,
-            @RequestParam("genre") Genre genre
-    ) {
+            @RequestParam("genre") Genre genre) {
         int userId = UserDetailsExtractor.getUserId();
         Track track = new Track();
         track.setTitle(title);

@@ -1,12 +1,12 @@
 package it.polimi.tiw.wt_music_playlist_2025.form;
 
-import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
-import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
+import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 
 public class PlaylistForm {
     private String title;

@@ -1,6 +1,9 @@
 package it.polimi.tiw.wt_music_playlist_2025.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class PlaylistTracks {
@@ -35,4 +38,3 @@ public class PlaylistTracks {
     }
 
 }
-

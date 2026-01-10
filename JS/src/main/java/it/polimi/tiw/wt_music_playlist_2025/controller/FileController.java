@@ -1,30 +1,31 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 public class FileController {
 
     @GetMapping("/file/{user_id}/{playlist_name}/{cover_name}")
-    public ResponseEntity<UrlResource> serveSafeFile(@PathVariable("user_id") String userId, @PathVariable("playlist_name") String playlistName, @PathVariable("cover_name") String coverName) {
+    public ResponseEntity<UrlResource> serveSafeFile(@PathVariable("user_id") String userId,
+            @PathVariable("playlist_name") String playlistName, @PathVariable("cover_name") String coverName) {
         if (UserDetailsExtractor.getUserId() != Integer.parseInt(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Path baseDir = Paths.get("/home/zarch/Documents/tiw_db/").toAbsolutePath();
-        Path requested = baseDir.resolve(userId + File.separator + playlistName + File.separator + coverName).normalize();
+        Path requested = baseDir.resolve(userId + File.separator + playlistName + File.separator + coverName)
+                .normalize();
 
         if (!Files.exists(requested) || !Files.isRegularFile(requested)) {
             return ResponseEntity.notFound().build();

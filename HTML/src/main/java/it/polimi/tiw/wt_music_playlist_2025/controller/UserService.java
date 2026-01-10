@@ -1,14 +1,13 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
-import org.springframework.security.core.userdetails.User;
+import java.util.ArrayList;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -23,7 +22,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         it.polimi.tiw.wt_music_playlist_2025.entity.User user = userDAO.findByUsername(username);
         if (user != null) {
-            return new UserWithId(user.getId(), user.getUsername(), "{noop}"+user.getPassword(), new ArrayList<>());
+            return new UserWithId(user.getId(), user.getUsername(), "{noop}" + user.getPassword(), new ArrayList<>());
         }
         throw new UsernameNotFoundException(username);
     }

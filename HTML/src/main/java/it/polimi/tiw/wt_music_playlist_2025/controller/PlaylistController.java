@@ -1,18 +1,17 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
+import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
 
 @Controller
 public class PlaylistController {
@@ -27,7 +26,8 @@ public class PlaylistController {
     }
 
     @GetMapping("/playlist/{playlist_id}/{group}")
-    public String showPage(Model model, HttpSession session, @PathVariable("playlist_id") int playlistId, @PathVariable("group") int offset) {
+    public String showPage(Model model, @PathVariable("playlist_id") int playlistId,
+            @PathVariable("group") int offset) {
         this.userId = UserDetailsExtractor.getUserId();
         this.playlistId = playlistId;
         List<Track> tracks;
@@ -50,7 +50,7 @@ public class PlaylistController {
     }
 
     @PostMapping("/playlist/add_track_to_playlist")
-    public String addTrackToPlaylist(PlaylistForm playlistForm, HttpSession session) {
+    public String addTrackToPlaylist(PlaylistForm playlistForm) {
         try {
             playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
         } catch (RuntimeException e) {

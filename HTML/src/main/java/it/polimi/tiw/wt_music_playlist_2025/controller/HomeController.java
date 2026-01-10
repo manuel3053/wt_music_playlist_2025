@@ -1,26 +1,28 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
-import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
-import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
-import it.polimi.tiw.wt_music_playlist_2025.form.TrackForm;
-import it.polimi.tiw.wt_music_playlist_2025.entity.*;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.Principal;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
+
+import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
+import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Genre;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
+import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
+import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
+import it.polimi.tiw.wt_music_playlist_2025.form.TrackForm;
 
 @Controller
 public class HomeController {
@@ -40,7 +42,7 @@ public class HomeController {
     private final PlaylistTracksDAO playlistTracksDAO;
 
     @GetMapping("/home")
-    public String showPage(Model model, HttpSession session) {
+    public String showPage(Model model) {
         int userId = UserDetailsExtractor.getUserId();
         try {
             model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));

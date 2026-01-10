@@ -1,19 +1,22 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.TrackDAO;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @RestController
 public class PlaylistController {
@@ -40,8 +43,7 @@ public class PlaylistController {
     @PostMapping("/add_playlist")
     public void addPlaylist(
             @RequestParam("title") String title,
-            @RequestParam("selected_tracks") List<Integer> selectedTracks
-    ) {
+            @RequestParam("selected_tracks") List<Integer> selectedTracks) {
         Playlist insertedPlaylist;
         try {
             int userId = UserDetailsExtractor.getUserId();
@@ -72,8 +74,7 @@ public class PlaylistController {
     @PostMapping("/add_tracks_to_playlist")
     public void addTracksToPlaylist(
             @RequestParam("playlist_id") Integer playlistId,
-            @RequestParam("selected_tracks") List<Integer> selectedTracks
-    ) {
+            @RequestParam("selected_tracks") List<Integer> selectedTracks) {
         int userId = UserDetailsExtractor.getUserId();
         Playlist playlist = playlistDAO.findByAuthorIdAndId(userId, playlistId);
         if (playlist == null) {
@@ -109,8 +110,7 @@ public class PlaylistController {
     @PostMapping("/set_custom_order")
     public void setCustomOrder(
             @RequestParam("playlist_id") Integer playlistId,
-            @RequestParam("tracks") List<Integer> tracks
-    ) {
+            @RequestParam("tracks") List<Integer> tracks) {
         Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), playlistId);
         if (playlist == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);

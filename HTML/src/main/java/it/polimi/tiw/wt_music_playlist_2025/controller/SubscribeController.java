@@ -1,26 +1,21 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
-import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
-import it.polimi.tiw.wt_music_playlist_2025.form.UserForm;
-import it.polimi.tiw.wt_music_playlist_2025.entity.User;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.server.ResponseStatusException;
+
+import it.polimi.tiw.wt_music_playlist_2025.DAO.UserDAO;
+import it.polimi.tiw.wt_music_playlist_2025.form.UserForm;
 
 @Controller
 public class SubscribeController {
 
+    private final UserDAO userDAO;
+
     public SubscribeController(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
-
-    private final UserDAO userDAO;
 
     @GetMapping("/subscribe")
     public String showPage(Model model) {
@@ -37,6 +32,5 @@ public class SubscribeController {
         }
         return Route.LOGIN.go();
     }
-
 
 }
