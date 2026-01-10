@@ -70,7 +70,7 @@ public class PlaylistController {
     }
 
     @PostMapping("/add_tracks_to_playlist")
-    public void addPlaylist(
+    public void addTracksToPlaylist(
             @RequestParam("playlist_id") Integer playlistId,
             @RequestParam("selected_tracks") List<Integer> selectedTracks
     ) {
