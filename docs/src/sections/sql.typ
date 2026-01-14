@@ -4,19 +4,12 @@
 
 == Overview
 
-The project requirements slightly change from `pure_html` and `js`, where the latter requires the tracks to support an individual custom order within the playlist to which they are associated -- this is achieved by adding an optional position column in `track` and a custom order flag in `playlist`
+The project requirements slightly change from `pure_html` and `js`, where the latter requires the playlist to support custom ordering the tracks -- this is achieved by adding an optional position column in `track` and a custom order flag in `playlist`
 
-In both scenarios, the schema is composed by four tables: `user`, `track`, `playlist` and `playlist_tracks`.
-
-#figure(
-  image("../img/placeholder.png", height: 40%),
-  // image("../img/uml/uml_bluetto.png"),
-  caption: [UML diagram.],
-)<uml-diagram>
+In both scenarios, the schema is the same.
 
 == The tables
 
-- `user` table
 ```sql
 CREATE TABLE user
 (
@@ -28,12 +21,10 @@ CREATE TABLE user
 
     PRIMARY KEY (id),
     UNIQUE KEY `username` (`username`),
-    UNIQUE (username)
 );
 ```
 it is quite staightforward and standard. Apart from the `id` attribute, which is the primary key, the only other attribute that has a unique constraint is `username`.
 
-- `track` table
 ```sql
 CREATE TABLE track
 (
@@ -49,16 +40,18 @@ CREATE TABLE track
     position    integer,
 
     PRIMARY KEY (id),
-    UNIQUE (loader_id, title, author, album_title, album_publication_year),
-    FOREIGN KEY (loader_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE
+    UNIQUE (loader_id, title, author, 
+    album_title, album_publication_year),
+    FOREIGN KEY (loader_id) 
+    REFERENCES user (id) 
+    ON UPDATE CASCADE ON DELETE CASCADE
 );
 ```
 
-there unique constraint on `loader_id, title, author, album_title, album_publication_year` is to make sure that the user doesn't load duplicates (there are almost all the attributes inside it to address the unlikely situation where an almost identical track is loaded).
+the unique constraint on `loader_id, title, author, album_title, album_publication_year` is to make sure that the user doesn't load duplicates (there are almost all the attributes inside it to address the unlikely situation where an almost identical track is loaded).
 
 The `loader_id` foreign key references the `id` of the user and if it is removed, his tracks are also removed.
 
-- `playlist` table
 ```sql
 CREATE TABLE playlist
 (
@@ -70,14 +63,15 @@ CREATE TABLE playlist
 
     PRIMARY KEY (id),
     UNIQUE (title, author_id),
-    FOREIGN KEY (author_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (author_id) 
+    REFERENCES user (id) 
+    ON UPDATE CASCADE ON DELETE CASCADE
 );
 ```
 
 The `creatione_date` attribute defaults to the today's date; and there is also the unique constraint on `title, author_id` because a playlist is bound to a single user (who can't have duplicate playlists -- that is with the same title) via the foreign key.
 
 
-- `playlist_tracks` table
 ```sql
 CREATE TABLE playlist_tracks
 (
@@ -95,5 +89,5 @@ CREATE TABLE playlist_tracks
 );
 ```<playlist-tracks-code>
 
-This table represents the "Contained in" relation in the ER diagram (@er-diagram). If a track or a playlist is removed their relationship is also removed.
+This table represents the "Contains" relation in the ER diagram (@er-diagram). If a track or a playlist is removed their relationship is also removed.
 

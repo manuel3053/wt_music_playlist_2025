@@ -1,4 +1,5 @@
 import { AuthRepository } from "./api.service.js";
+import { SubscribePage } from "./subscribe.js";
 class Login {
     constructor() {
         this._authRepository = new AuthRepository();
@@ -10,6 +11,12 @@ class Login {
             this._authRepository.login(formData)
                 .then(() => window.location.href = "app.html")
                 .catch(() => alert("Login fallito"));
+        });
+        const subscribe = document.getElementById("subscribe");
+        subscribe.addEventListener("click", () => {
+            const page = new SubscribePage();
+            document.body.innerHTML = page.template;
+            page.build();
         });
     }
 }

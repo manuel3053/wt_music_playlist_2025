@@ -1,9 +1,7 @@
-import { AuthRepository } from "./api.service.js";
 import { Header } from "./header.js";
 import { HomePage } from "./homepage.js";
 export class App {
     constructor() {
-        this._authCaller = new AuthRepository();
         this._history = [];
         this.currentPage = new HomePage(this);
         const headerComponent = new Header(this);
@@ -13,7 +11,6 @@ export class App {
     }
     set currentPage(page) {
         this._history.push(page);
-        this._currentPage = page;
         this.buildPage(page);
     }
     pop() {

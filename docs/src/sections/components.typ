@@ -135,7 +135,7 @@ parla delle viste html e delle viste per typescript
 #show: table-styles.with()
 
 #figure(
-  placement: top,
+  placement: bottom,
   scope: "parent",
   table(
     columns: 4,

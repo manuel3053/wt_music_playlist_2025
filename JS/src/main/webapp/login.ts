@@ -1,4 +1,5 @@
 import { AuthRepository } from "./api.service.js"
+import { SubscribePage } from "./subscribe.js";
 
 class Login {
   private _authRepository: AuthRepository = new AuthRepository()
@@ -20,6 +21,9 @@ class Login {
     subscribe.addEventListener(
       "click",
       () => {
+        const page = new SubscribePage()
+        document.body.innerHTML = page.template
+        page.build()
       }
     )
 

@@ -122,7 +122,7 @@ export class PlaylistRepository extends ApiRepository {
   }
 
   setCustomOrder(form: FormData): Promise<void> {
-    return this._apiService.submit(this.toFullPath("get_playlists"), form)
+    return this._apiService.submit(this.toFullPath("set_custom_order"), form)
   }
 
 

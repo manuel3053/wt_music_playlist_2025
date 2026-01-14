@@ -1,15 +1,24 @@
 package it.polimi.tiw.wt_music_playlist_2025.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistDAO;
 import it.polimi.tiw.wt_music_playlist_2025.DAO.PlaylistTracksDAO;
@@ -20,117 +29,132 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Track;
 
 @RestController
 public class PlaylistController {
-    private final TrackDAO trackDAO;
-    private final PlaylistDAO playlistDAO;
-    private final PlaylistTracksDAO playlistTracksDAO;
+  private final TrackDAO trackDAO;
+  private final PlaylistDAO playlistDAO;
+  private final PlaylistTracksDAO playlistTracksDAO;
 
-    public PlaylistController(TrackDAO trackDAO, PlaylistDAO playlistDAO, PlaylistTracksDAO playlistTracksDAO) {
-        this.trackDAO = trackDAO;
-        this.playlistDAO = playlistDAO;
-        this.playlistTracksDAO = playlistTracksDAO;
+  public PlaylistController(TrackDAO trackDAO, PlaylistDAO playlistDAO, PlaylistTracksDAO playlistTracksDAO) {
+    this.trackDAO = trackDAO;
+    this.playlistDAO = playlistDAO;
+    this.playlistTracksDAO = playlistTracksDAO;
+  }
+
+  @GetMapping("/get_playlists")
+  public List<Playlist> getPlaylists() {
+    return playlistDAO.findByAuthorIdOrderByCreationDateAsc(UserDetailsExtractor.getUserId());
+  }
+
+  @GetMapping("/get_playlist_size_by_id/{id}")
+  public int getPlaylistSizeByid(@PathVariable("id") int id) {
+    return playlistTracksDAO.getAllByPlaylistId(id, UserDetailsExtractor.getUserId()).size();
+  }
+
+  @PostMapping("/add_playlist")
+  public void addPlaylist(
+      @RequestParam("title") String title,
+      @RequestParam("selected_tracks") List<Integer> selectedTracks) {
+    Playlist insertedPlaylist;
+    try {
+      int userId = UserDetailsExtractor.getUserId();
+      Playlist playlist = new Playlist();
+      playlist.setTitle(title);
+      playlist.setAuthorId(userId);
+      playlist.setCustomOrder(false);
+      playlist.setCreationDate(new Date(System.currentTimeMillis()));
+      insertedPlaylist = playlistDAO.save(playlist);
+
+      List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+          .map(Track::getId).toList();
+      playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
+        if (userTracks.contains(trackId)) {
+          PlaylistTracks p = new PlaylistTracks();
+          p.setPlaylistId(insertedPlaylist.getId());
+          p.setTrackId(trackId);
+          return p;
+        } else {
+          throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+      }).toList());
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PostMapping("/add_tracks_to_playlist")
+  public void addTracksToPlaylist(
+      @RequestParam("playlist_id") Integer playlistId,
+      @RequestParam("selected_tracks") List<Integer> selectedTracks) {
+    int userId = UserDetailsExtractor.getUserId();
+    Playlist playlist = playlistDAO.findByAuthorIdAndId(userId, playlistId);
+    if (playlist == null) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping("/get_playlists")
-    public List<Playlist> getPlaylists() {
-        return playlistDAO.findByAuthorIdOrderByCreationDateAsc(UserDetailsExtractor.getUserId());
+    if (playlist.getCustomOrder()) {
+      int lastPosition = trackDAO.getAllInPlaylist(userId, playlistId).size() - 1;
+      for (int i = 0; i < selectedTracks.size(); i++) {
+        trackDAO.updatePosition(lastPosition + i, selectedTracks.get(i));
+      }
     }
 
-    @GetMapping("/get_playlist_size_by_id/{id}")
-    public int getPlaylistSizeByid(@PathVariable("id") int id) {
-        return playlistTracksDAO.getAllByPlaylistId(id, UserDetailsExtractor.getUserId()).size();
+    try {
+      List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+          .map(Track::getId).toList();
+      playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
+        if (userTracks.contains(trackId)) {
+          PlaylistTracks p = new PlaylistTracks();
+          p.setPlaylistId(playlistId);
+          p.setTrackId(trackId);
+          return p;
+        } else {
+          throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+      }).toList());
+
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PostMapping("/set_custom_order")
+  public void setCustomOrder(
+      @RequestParam("playlist_id") Integer playlistId,
+      @RequestParam("tracks") String tracksJson) {
+    // Integer playlistId = setCustomOrderDTO.getPlaylistId();
+    List<Integer> tracks;
+    try {
+      tracks = new ObjectMapper().readValue(tracksJson, new TypeReference<List<Integer>>() {
+      });
+    } catch (JsonProcessingException e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @PostMapping("/add_playlist")
-    public void addPlaylist(
-            @RequestParam("title") String title,
-            @RequestParam("selected_tracks") List<Integer> selectedTracks) {
-        Playlist insertedPlaylist;
-        try {
-            int userId = UserDetailsExtractor.getUserId();
-            Playlist playlist = new Playlist();
-            playlist.setTitle(title);
-            playlist.setAuthorId(userId);
-            playlist.setCustomOrder(false);
-            playlist.setCreationDate(new Date(System.currentTimeMillis()));
-            insertedPlaylist = playlistDAO.save(playlist);
-
-            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
-                    .map(Track::getId).toList();
-            playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
-                if (userTracks.contains(trackId)) {
-                    PlaylistTracks p = new PlaylistTracks();
-                    p.setPlaylistId(insertedPlaylist.getId());
-                    p.setTrackId(trackId);
-                    return p;
-                } else {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-                }
-            }).toList());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    System.out.println("A");
+    Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), playlistId);
+    if (playlist == null) {
+      System.out.println("B");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("/add_tracks_to_playlist")
-    public void addTracksToPlaylist(
-            @RequestParam("playlist_id") Integer playlistId,
-            @RequestParam("selected_tracks") List<Integer> selectedTracks) {
-        int userId = UserDetailsExtractor.getUserId();
-        Playlist playlist = playlistDAO.findByAuthorIdAndId(userId, playlistId);
-        if (playlist == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    try {
+      System.out.println("C");
+      int userId = UserDetailsExtractor.getUserId();
+      List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
+          .map(Track::getId).toList();
+      playlistDAO.setCustomOrder(playlistId);
+      for (int i = 0; i < tracks.size(); i++) {
+        if (userTracks.contains(tracks.get(i))) {
+          System.out.println("E");
+          playlistTracksDAO.updatePosition(i, tracks.get(i), playlistId);
+        } else {
+          System.out.println("F");
+          throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+      }
 
-        if (playlist.getCustomOrder()) {
-            int lastPosition = trackDAO.getAllInPlaylist(userId, playlistId).size() - 1;
-            for (int i = 0; i < selectedTracks.size(); i++) {
-                trackDAO.updatePosition(lastPosition + i, selectedTracks.get(i));
-            }
-        }
-
-        try {
-            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
-                    .map(Track::getId).toList();
-            playlistTracksDAO.saveAll(selectedTracks.stream().map((trackId) -> {
-                if (userTracks.contains(trackId)) {
-                    PlaylistTracks p = new PlaylistTracks();
-                    p.setPlaylistId(playlistId);
-                    p.setTrackId(trackId);
-                    return p;
-                } else {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-                }
-            }).toList());
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    } catch (Exception e) {
+      System.out.println("G");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    @PostMapping("/set_custom_order")
-    public void setCustomOrder(
-            @RequestParam("playlist_id") Integer playlistId,
-            @RequestParam("tracks") List<Integer> tracks) {
-        Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), playlistId);
-        if (playlist == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        try {
-            int userId = UserDetailsExtractor.getUserId();
-            List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
-                    .map(Track::getId).toList();
-
-            playlistDAO.setCustomOrder(playlistId);
-            for (int i = 0; i < tracks.size(); i++) {
-                if (userTracks.contains(tracks.get(i))) {
-                    trackDAO.updatePosition(i, tracks.get(i));
-                } else {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-                }
-            }
-
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+  }
 }

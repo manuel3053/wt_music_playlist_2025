@@ -1,15 +1,13 @@
-import { Component } from "./component.js"
-import { AuthRepository } from "./api.service.js"
-
-export class SubscribePage implements Component {
-  private _authRepository: AuthRepository = new AuthRepository()
-
-  get css(): string {
-    return ""
-  }
-
-  get template(): string {
-    return `
+import { AuthRepository } from "./api.service.js";
+export class SubscribePage {
+    constructor() {
+        this._authRepository = new AuthRepository();
+    }
+    get css() {
+        return "";
+    }
+    get template() {
+        return `
         <div class = "login">
             <form method="post" class="form" id="form">
                 <label class="form-field-name">Name</label>
@@ -23,20 +21,17 @@ export class SubscribePage implements Component {
                 <input class="form-button" type="submit"/>
             </form>
         </div>
-      `
-  }
-
-  build(): void {
-    const form = document.getElementById("form") as HTMLFormElement
-
-    form.addEventListener('submit', (event) => {
-      event.preventDefault()
-      const formData = new FormData(form)
-      form.reset()
-      this._authRepository.subscribe(formData)
-        .then(() => window.location.href = "index.html")
-        .catch(() => alert("Failed subscription"))
-    });
-
-  }
+      `;
+    }
+    build() {
+        const form = document.getElementById("form");
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            form.reset();
+            this._authRepository.subscribe(formData)
+                .then(() => window.location.href = "index.html")
+                .catch(() => alert("Failed subscription"));
+        });
+    }
 }

@@ -446,6 +446,10 @@
 #import "@preview/chronos:0.2.1": * // sequence diagrams
 
 #let thymeleaf = image("img/logos/thymeleaf.svg", width: 1.5em, height: 1.5em, fit: "contain")
+#let springboot = image("img/logos/spring-boot.svg", width: 1.5em, height: 1.5em, fit: "contain")
+#let client = image("img/logos/pc.svg", width: 1.5em, height: 1.5em, fit: "contain")
+#let guard = image("img/logos/guard.svg", width: 1.5em, height: 1.5em, fit: "contain")
+#let servlet = image("img/logos/package.svg", width: 1.5em, height: 1.5em, fit: "contain")
 
 #let balance(content, position: top) = context {
   let height = measure(

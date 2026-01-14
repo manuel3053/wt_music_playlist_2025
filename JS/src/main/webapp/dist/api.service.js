@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Playlist } from "./model/playlist.js";
 import { Track } from "./model/track.js";
-import { User } from "./model/user.js";
 export class ErrorResponse {
     constructor(response) {
         this._response = response;
@@ -22,12 +21,8 @@ export class ErrorResponse {
     }
 }
 export class ApiService {
-    buildHeaders() {
-        const headers = new Headers();
-        return headers;
-    }
     createRequest(address, body) {
-        const headers = this.buildHeaders();
+        const headers = new Headers();
         headers.set('Content-Type', 'application/json');
         return body === undefined
             ? new Request(address, { headers: headers, method: 'GET' })
@@ -111,9 +106,6 @@ export class ApiRepository {
     }
 }
 export class PlaylistRepository extends ApiRepository {
-    getPlaylistSizeById(id) {
-        return this._apiService.getPrimitive(this.toFullPath(`get_playlist_size_by_id?id=${id}`));
-    }
     addTracksToPlaylist(form) {
         return this._apiService.submit(this.toFullPath(`add_tracks_to_playlist`), form);
     }
@@ -123,13 +115,13 @@ export class PlaylistRepository extends ApiRepository {
     getPlaylists() {
         return this._apiService.getList(Playlist, this.toFullPath("get_playlists"));
     }
+    setCustomOrder(form) {
+        return this._apiService.submit(this.toFullPath("set_custom_order"), form);
+    }
 }
 export class TrackRepository extends ApiRepository {
     createTrack(form) {
         return this._apiService.submit(this.toFullPath(`add_track`), form);
-    }
-    getAllTracksSorted() {
-        return this._apiService.getList(Track, this.toFullPath(`get_all_tracks_sorted`));
     }
     getTrackById(trackId) {
         return this._apiService.get(Track, this.toFullPath(`get_track_by_id/${trackId}`));
@@ -153,12 +145,6 @@ export class AuthRepository extends ApiRepository {
     }
     logout() {
         return this._apiService.call(this.toFullPath("logout"), {});
-    }
-    test() {
-        return this._apiService.get(User, this.toFullPath("test"));
-    }
-    testone() {
-        return this._apiService.get(User, this.toFullPath("testone"));
     }
     subscribe(form) {
         return this._apiService.submit(this.toFullPath("subscribe"), form);

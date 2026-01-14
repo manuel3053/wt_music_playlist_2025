@@ -1,10 +1,9 @@
-import { AuthRepository, PlaylistRepository, TrackRepository } from "./api.service.js";
+import { PlaylistRepository, TrackRepository } from "./api.service.js";
 import { App } from "./app.js";
 import { Modal } from "./modal.js";
 import { PlaylistPage } from "./playlistpage.js";
 export class HomePage {
     constructor(context) {
-        this._authCaller = new AuthRepository();
         this._trackRepository = new TrackRepository();
         this._playlistRepository = new PlaylistRepository();
         this.context = context;

@@ -54,9 +54,9 @@ public class PlaylistController {
         try {
             playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
         } catch (RuntimeException e) {
-            return "redirect:view/" + userId + "/" + playlistId + "/0";
+            return "redirect:/" + playlistId + "/0";
         }
-        return "redirect:view/" + userId + "/" + playlistId + "/0";
+        return "redirect:/" + playlistId + "/0";
     }
 
 }

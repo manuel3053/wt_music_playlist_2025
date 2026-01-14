@@ -1,8 +1,10 @@
-import { TrackRepository } from "./api.service.js";
+import { PlaylistRepository, TrackRepository } from "./api.service.js";
 export class Modal {
     constructor(context, playlistId) {
         this._trackRepository = new TrackRepository();
-        this.context = context;
+        this._playlistRepository = new PlaylistRepository();
+        this._orderChanged = false;
+        this._sortedTracksIds = [];
         this.playlistId = playlistId;
     }
     get css() {
@@ -16,24 +18,29 @@ export class Modal {
     `;
     }
     save() {
-        // se delle tracce sono state spostate:
-        // - segna la playlist con custom_order
-        // - segna nelle tracce la posizione
+        if (this._orderChanged) {
+            const formdData = new FormData();
+            formdData.append("playlist_id", this.playlistId.toString());
+            console.log(this._sortedTracksIds);
+            formdData.append("tracks", JSON.stringify(this._sortedTracksIds.map(Number)));
+            this._playlistRepository.setCustomOrder(formdData).catch(console.log);
+        }
     }
     build() {
         this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
             const modal = document.getElementById("modal");
             modal.innerHTML = "";
-            tracks.forEach((t, index) => {
+            tracks.forEach(t => {
                 const title = document.createElement("div");
                 title.textContent = t.title;
                 title.className = "draggable";
-                title.setAttribute('position', index.toString());
                 title.draggable = true;
+                title.setAttribute("id", t.id.toString());
                 title.addEventListener("dragstart", this.dragStart.bind(this));
                 title.addEventListener("dragover", this.dragOver.bind(this));
                 title.addEventListener("drop", this.drop.bind(this));
                 modal.append(title);
+                this._sortedTracksIds.push(t.id.toString());
             });
         });
     }
@@ -44,15 +51,20 @@ export class Modal {
         e.preventDefault();
     }
     drop(e) {
-        this.dest = e.target.closest(".draggable");
+        this.end = e.target.closest(".draggable");
         const modal = document.getElementById("modal");
         const list = Array.from(modal.querySelectorAll(".draggable"));
-        const position = list.indexOf(this.dest);
-        if (list.indexOf(this.start) < position) {
-            this.start.parentElement.insertBefore(this.start, list[position + 1]);
+        const endPosition = list.indexOf(this.end);
+        const startPosition = list.indexOf(this.start);
+        if (startPosition < endPosition) {
+            this.start.parentElement.insertBefore(this.start, list[endPosition + 1]);
         }
         else {
-            this.start.parentElement.insertBefore(this.start, list[position]);
+            this.start.parentElement.insertBefore(this.start, list[endPosition]);
         }
+        const tmp = this._sortedTracksIds[startPosition];
+        this._sortedTracksIds[startPosition] = this.end.getAttribute("id");
+        this._sortedTracksIds[endPosition] = tmp;
+        this._orderChanged = true;
     }
 }

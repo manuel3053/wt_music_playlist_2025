@@ -12,10 +12,18 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.PlaylistTracks;
 @Repository
 @Transactional
 public interface PlaylistTracksDAO extends JpaRepository<PlaylistTracks, Integer> {
-    PlaylistTracks save(PlaylistTracks playlistTracks);
+  PlaylistTracks save(PlaylistTracks playlistTracks);
 
-    @NativeQuery(value = "select pt.* " +
-            "from track tx join playlist_tracks pt on tx.id = pt.track_id " +
-            "where pt.playlist_id = ?1 and tx.loader_id = ?2 ")
-    List<PlaylistTracks> getAllByPlaylistId(int playlistId, int userId);
+  @NativeQuery(value = "select pt.* " +
+      "from track tx join playlist_tracks pt on tx.id = pt.track_id " +
+      "where pt.playlist_id = ?1 and tx.loader_id = ?2 ")
+  List<PlaylistTracks> getAllByPlaylistId(int playlistId, int userId);
+
+  @NativeQuery(value = """
+      update playlist_tracks
+      set position = ?1
+      where playlist_id = ?3 and track_id = ?2
+      """)
+  void updatePosition(int position, int trackId, int playlistId);
+
 }

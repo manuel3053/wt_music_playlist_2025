@@ -32,8 +32,10 @@ export class Modal implements Component {
     if (this._orderChanged) {
       const formdData = new FormData()
       formdData.append("playlist_id", this.playlistId.toString())
-      formdData.append("tracks", JSON.stringify(this._sortedTracksIds))
-      this._playlistRepository.setCustomOrder(formdData)
+      console.log(this._sortedTracksIds);
+
+      formdData.append("tracks", JSON.stringify(this._sortedTracksIds.map(Number)))
+      this._playlistRepository.setCustomOrder(formdData).catch(console.log)
     }
   }
 

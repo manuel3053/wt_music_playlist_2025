@@ -1,4 +1,6 @@
+#import "@preview/cetz:0.4.2"
 #import "../lib.typ": *
+#import "../dati-basati/src/lib.typ" as db
 
 = Project submission breakdown<project-breakdown>
 
@@ -18,18 +20,116 @@ Each #entity[user] has a #attr[username], #attr[password], #attr[name] and #attr
 - It is not requested to store the track order within albums
 - Suppose #attr_spec[each track can belong to a unique album] (no compilations)
 
+// #colbreak()
+
 After the login, the user is able to #rel[create tracks] by loading their data and then group them in playlists. A #entity[playlist] #rel[is a set of chosen tracks] from the uploaded ones of the user. A playlist has a #attr[title], a #attr[creation date] and is #rel[associated to its creator].
+
+#let entities = (
+  "user": (
+    coordinates: (0, 0),
+    attributes: (
+      "west": ("id", "nickname", "password",),
+      "north": ("name", "surname"),
+    ),
+    primary-key: ("id",),
+    weak-primary-key: none,
+    label: "user",
+    name: "user",
+  ),
+  "playlist": (
+    coordinates: (5, -5),
+    attributes: (
+      "north": ("title", "id", "author_id", "creation_date", "custom_order",).rev(),
+    ),
+    primary-key: ("id",),
+    weak-primary-key: ("title", "west"),
+    label: "playlist",
+    name: "playlist",
+  ),
+  "track": (
+    coordinates: (10, 0),
+    attributes: (
+      "east": ("id", "title", "file_path", "image_path",).rev(),
+      "north": ("loader_id", "author", "genre", "position", "album_publication_year", "album_title"),
+    ),
+    primary-key: ("id",),
+    weak-primary-key: none,
+    label: "track",
+    name: "track",
+  ),
+)
+
+#let relations = (
+  "user-playlist": (
+    coordinates: (0, -5),
+    entities: ("user", "playlist"),
+    label: "creates",
+    name: "user-playlist",
+    cardinality: ("(0,n)", "(1,1)"),
+    attributes: none,
+  ),
+  "user-track": (
+    coordinates: (5, 0),
+    entities: ("user", "track"),
+    label: "uploads",
+    name: "user-track",
+    cardinality: ("(0,n)", "(1,1)"),
+    attributes: none,
+  ),
+  "playlist-track": (
+    coordinates: (10, -5),
+    entities: ("playlist", "track"),
+    label: "contains",
+    name: "playlist-track",
+    cardinality: ("(0,n)", "(0,n)"),
+    attributes: none,
+  ),
+)
+
+
 
 #figure(
   placement: bottom,
   scope: "parent",
-  image("../img/placeholder.png", width: 90%),
-  caption: [ER diagram (HTML).],
+  cetz.canvas({
+    import cetz.draw: *
+    register-mark("filled-circle", style => {
+      circle((0, 0), radius: 0.2em, fill: black)
+      anchor("tip", (0.2em, 0))
+      anchor("base", (-0.2em, 0))
+    })
+    line(
+      (3.6, -4), (2.6, -4), (2.6, -5.3),
+      length: 4,
+      mark: (end: "filled-circle"),
+      stroke: 1pt + black
+    )
+    for entity in entities.values() {
+      db.entity(
+        entity.coordinates,
+        label: entity.label,
+        name: entity.name,
+        attributes: entity.attributes,
+        primary-key: entity.primary-key,
+        weak-primary-key: entity.weak-primary-key,
+      )
+    }
+
+    for relation in relations.values() {
+      db.relation(
+        coordinates: relation.coordinates,
+        entities: relation.entities,
+        label: relation.label,
+        name: relation.name,
+        cardinality: relation.cardinality,
+        attributes: relation.attributes,
+      )
+    }
+  }),
+  caption: [ER diagram (HTML and RIA).],
 )<er-diagram>
 
-For the UML diagram, see @sql-database-schema.
-
-#colbreak()
+// #colbreak()
 
 == Behaviour
 
@@ -46,9 +146,9 @@ After the login, the user #user_action[accesses] the #page[HOME PAGE] which #ser
 - #server_action[Shows] the #element[list of user tracks] ordered by artist name in ascending alphabetic order and by ascending album release date
 - The form allows to #user_action[select] one or more tracks
 
-When a user #user_action[clicks] on a playlist in the #page[HOME PAGE], the application #server_action[loads] the #page[PLAYLIST PAGE]\; initially, it contains a #element[table with a row and five columns].
+When a user #user_action[clicks] on a playlist in the #page[HOME PAGE], the application #server_action[loads] the #page[PLAYLIST PAGE]\; initially, it contains a #element[table with a row and five columns]:
 
-- Every cell contains the track's title and album name
+- Every cell contains the track's title and album cover
 - The tracks are ordered from left to right by artist name in ascending alphabetic order and by ascending album release date
 - If a playlist contains more than 5 tracks, there are available commands to see the others (in blocks of five)
 
@@ -64,20 +164,7 @@ When a user #user_action[clicks] on a playlist in the #page[HOME PAGE], the appl
 
 After adding a new track to the current playlist, the application #server_action[refreshes the page] to display the first block of the playlist (the first 5 tracks). Once a user #user_action[selects the title of a track], the #page[PLAYER PAGE] #server_action[shows] all of the #element[track data] and the #element[audio player].
 
-#figure(
-  placement: bottom,
-  scope: "parent",
-  image("../img/placeholder.png", height: 60%),
-  // image(
-  //   width: 100%,
-  //   // height: 100%,
-  //   fit: "contain",
-  //   "../img/ifml/ifml-pure_html.png",
-  // ),
-  caption: "IFML diagram (HTML).",
-)<html-ifml-diagram>
-
-#colbreak()
+// #colbreak()
 
 == RIA version
 
@@ -89,34 +176,37 @@ Create a client-server web application that modifies the previous specification 
 
 - The visualization event of the previous/next blocks is managed client-side without making a request to the server
 
-/ Track reordering : The application must allow the user to reorder the tracks in a playlist with a personalized order, different from the default one. From the #page[HOME PAGE] with an associated link to each playlist, the user is able to #user_action[access] a modal window #element[REORDER] which shows the full list of tracks ordered with the current criteria (custom or default).
+/ Track reordering : The application must allow the user to reorder the tracks in a playlist with a personalized order. From the #page[HOME PAGE] with an associated link to each playlist, the user #user_action[access] a modal window #element[REORDER] which shows the list of tracks ordered with the current criteria (custom or default).
+
+The user can #user_action[drag] the title of a track and #user_action[drop] it in a different position to achieve the desidered order, without invoking the server. Once finished, the user can click on a #element[button to save the order] and #server_action[store] the sequence on the server. In subsequent accesses, the personalized track order is #server_action[loaded] instead of the default one. A newly added track in a custom-ordered playlist is #server_action[inserted #underline(stroke: yellow.darken(20%))[always] at the end].
 
 == Added features
 
 - Logout function (@logout-sequence)
-- Subscribe function (@register-sequence)
+- Subscribe function (@subscribe-sequence)
 
-#colbreak()
+// #colbreak()
 
-The user can #user_action[drag] the title of a track and #user_action[drop] it in a different position to achieve the desidered order, without invoking the server. Once finished, the user can click on a #element[button to save the order] and #server_action[store] the sequence on the server. In subsequent accesses, the personalized track order is #server_action[loaded] instead of the default one. A newly added track in a custom-ordered playlist is #server_action[inserted #underline(stroke: yellow.darken(20%))[always] at the end].
+#figure(
+  placement: top,
+  scope: "parent",
+  image(
+    width: 115%,
+    fit: "contain",
+    "../img/ifml/ifml_html.png",
+  ),
+  caption: "IFML diagram (HTML).",
+)<html-ifml-diagram>
+
+
 
 #figure(
   placement: bottom,
   scope: "parent",
-  image("../img/placeholder.png", height: 30%),
-  caption: [ER diagram (RIA).],
-)<er-diagram-ria>
-
-
-#figure(
-  placement: bottom,
-  scope: "parent",
-  image("../img/placeholder.png", height: 100%),
-  // image(
-  //   width: 110%,
-  //   // height: 100%,
-  //   fit: "contain",
-  //   "../img/ifml/ifml-ria.png",
-  // ),
+  image(
+    width: 115%,
+    fit: "contain",
+    "../img/ifml/ifml_ria.png",
+  ),
   caption: "IFML diagram (RIA).",
 )<ria-ifml-diagram>
