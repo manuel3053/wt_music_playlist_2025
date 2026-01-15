@@ -15,48 +15,48 @@ import it.polimi.tiw.wt_music_playlist_2025.form.PlaylistForm;
 
 @Controller
 public class PlaylistController {
-    private final TrackDAO trackDAO;
-    private final PlaylistTracksDAO playlistTracksDAO;
-    private int playlistId;
-    private int userId;
+  private final TrackDAO trackDAO;
+  private final PlaylistTracksDAO playlistTracksDAO;
+  private int playlistId;
+  private int userId;
 
-    public PlaylistController(TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO) {
-        this.trackDAO = trackDAO;
-        this.playlistTracksDAO = playlistTracksDAO;
-    }
+  public PlaylistController(TrackDAO trackDAO, PlaylistTracksDAO playlistTracksDAO) {
+    this.trackDAO = trackDAO;
+    this.playlistTracksDAO = playlistTracksDAO;
+  }
 
-    @GetMapping("/playlist/{playlist_id}/{group}")
-    public String showPage(Model model, @PathVariable("playlist_id") int playlistId,
-            @PathVariable("group") int offset) {
-        this.userId = UserDetailsExtractor.getUserId();
-        this.playlistId = playlistId;
-        List<Track> tracks;
-        try {
-            tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5, userId);
-            if (tracks.isEmpty()) {
-                return Route.HOME.go();
-            }
-            model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId, userId).size());
-            model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(userId, playlistId));
-        } catch (RuntimeException e) {
-            return Route.HOME.go();
-        }
-        model.addAttribute("tracks", tracks);
-        model.addAttribute("userId", userId);
-        model.addAttribute("playlistId", playlistId);
-        model.addAttribute("offset", offset);
-        model.addAttribute("playlistForm", new PlaylistForm());
-        return Route.PLAYLIST.show();
+  @GetMapping("/playlist/{playlist_id}/{group}")
+  public String showPage(Model model, @PathVariable("playlist_id") int playlistId,
+      @PathVariable("group") int offset) {
+    this.userId = UserDetailsExtractor.getUserId();
+    this.playlistId = playlistId;
+    List<Track> tracks;
+    try {
+      tracks = trackDAO.getPlaylistTracksGroup(playlistId, offset * 5, userId);
+      if (tracks.isEmpty()) {
+        return Route.HOME.go();
+      }
+      model.addAttribute("playlistSize", playlistTracksDAO.getAllByPlaylistId(playlistId, userId).size());
+      model.addAttribute("tracksNotInPlaylist", trackDAO.getAllNotInPlaylist(userId, playlistId));
+    } catch (RuntimeException e) {
+      return Route.HOME.go();
     }
+    model.addAttribute("tracks", tracks);
+    model.addAttribute("userId", userId);
+    model.addAttribute("playlistId", playlistId);
+    model.addAttribute("offset", offset);
+    model.addAttribute("playlistForm", new PlaylistForm());
+    return Route.PLAYLIST.show();
+  }
 
-    @PostMapping("/playlist/add_track_to_playlist")
-    public String addTrackToPlaylist(PlaylistForm playlistForm) {
-        try {
-            playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
-        } catch (RuntimeException e) {
-            return "redirect:/" + playlistId + "/0";
-        }
-        return "redirect:/" + playlistId + "/0";
+  @PostMapping("/playlist/add_track_to_playlist")
+  public String addTrackToPlaylist(PlaylistForm playlistForm) {
+    try {
+      playlistTracksDAO.saveAll(playlistForm.toPlaylistTracks(playlistId));
+    } catch (RuntimeException e) {
+      return "redirect:/playlist/" + playlistId + "/0";
     }
+    return "redirect:/playlist/" + playlistId + "/0";
+  }
 
 }

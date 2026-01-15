@@ -13,13 +13,13 @@ html,
 body {
     margin: 0;
     padding: 0;
-    background-color: #999;
+    background-color: #002CFE;
 }
 
 * {
     font-family: SpaceMono;
     font-size: 16px;
-    color: white;
+    color: black;
 }
 
 input[type=file]::file-selector-button {
