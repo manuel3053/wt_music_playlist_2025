@@ -37,7 +37,6 @@ CREATE TABLE track
     album_title VARCHAR(64)  not null,
     album_publication_year integer not null,
     genre       VARCHAR(64)  not null,
-    position    integer,
 
     PRIMARY KEY (id),
     UNIQUE (loader_id, title, author, 
@@ -78,6 +77,7 @@ CREATE TABLE playlist_tracks
     id          integer AUTO_INCREMENT,
     playlist_id integer not null,
     track_id    integer not null,
+    position    integer,
 
     PRIMARY KEY (id),
     FOREIGN KEY (playlist_id) 

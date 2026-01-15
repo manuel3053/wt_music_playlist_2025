@@ -195,6 +195,10 @@ export class HomePage implements Component {
     const trackForm = document.getElementById("load-track") as HTMLFormElement
     trackForm.addEventListener('submit', (event) => {
       event.preventDefault()
+      if (!trackForm.checkValidity()) {
+        alert("The form is not compiled correctly")
+        return;
+      }
       const formData = new FormData(trackForm)
       trackForm.reset()
       this._trackRepository.createTrack(formData)
@@ -205,6 +209,10 @@ export class HomePage implements Component {
     const playlistForm = document.getElementById("load-playlist") as HTMLFormElement
     playlistForm.addEventListener('submit', (event) => {
       event.preventDefault()
+      if (!playlistForm.checkValidity()) {
+        alert("The form is not compiled correctly")
+        return;
+      }
       const formData = new FormData(playlistForm)
       playlistForm.reset()
       this._playlistRepository.createPlaylist(formData)

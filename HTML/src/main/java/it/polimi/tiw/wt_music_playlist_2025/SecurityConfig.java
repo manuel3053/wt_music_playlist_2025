@@ -26,10 +26,7 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/home")
                         .permitAll()
                 )
-                .logout(logout -> logout.permitAll()
-//                        .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/login")
-                );
+                .logout(logout -> logout.permitAll());
 
         return http.build();
     }

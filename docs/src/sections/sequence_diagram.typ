@@ -64,14 +64,70 @@
 = Sequence diagrams HTML
 
 == Disclaimer
-- scrivi cosa è DispatcherServlet e associalo all'icona
-- associa client ad icona
-- spiega che tutti i redirect seguono lo stesso sequence di quando si richiede una pagina normalmente e che questo è stato omesso per semplicità
-- Aggiungi che Springboot modifica molto i sequence diagram rispetto a delle basilari servlet
+
+Space on a page is not infinite and Springboot adds some intermidiate passages, so, to keep things readable, these assumptions are applied to the following sequence diagrams.
+
+== Client
+
+#grid(
+  columns: (auto, 1fr),
+  align: horizon + left,
+  [Represented by:],
+  client
+)
+
+== DispatcherServlet
+
+#grid(
+  columns: (auto, 1fr),
+  align: horizon + left,
+  [Represented by:],
+  servlet
+)
+
+This servlet is used by Springboot to route incoming requests to the correct servlets created by the mappings in Springboot controllers.
+
+In the case of a traditional MVC application (like the HTML version of this project), this servlet is also used manage the rendering of a page: in this case the servlet has to pass a ModelAndView object to a render function.
+
+In order to build this ModelAndView object, a Model object and a View object are needed; it's possible to create manually a ModelAndView object but in this project a different solution is adopted:
++ Each mapping (associated for convention to a showPage() method) that has to load the page, obtains the Model from the framework (by using dependancy injection)
++ The Model is then filled with data that needs to be used by the view (in this case a thymeleaf template)
++ The mapping returns a string with the name of a template (return "home" $=>$ loads home.html); this string is read by the DispatcherServlet to create the view
+
+At the end of the process the DispatcherServlet can build the ModelAndView object and render it.
+
+== Redirects
+
+After some operations (like adding a new track), the user wants to see changes: the mappings that are associated to those operations follow the same flow, like in the following example:
++ the user requests the home page with a GET call to /home
++ In the home page the user loads a new track with a POST call to /add_track
++ /add_track saves the track
++ /add_track redirects the user to /home
++ the home page is loaded again, this time with also the new track
+
+== Exceptions
+
+All exceptions are managed, but since it wasn't a requirement of the project to manage them precisely (and because of time constraints), they are captured by simple catch statements that catches RuntimeExceptions
+
+== UserId
+
+UserId appears a lot of times in the following diagrams: each time it is seen, the following snippet of code is executed:
+
+```java
+public static int getUserId() {
+    return ((UserWithId) 
+    SecurityContextHolder
+    .getContext()
+    .getAuthentication()
+    .getPrincipal())
+    .getId();
+}
+```
+
+When a user is authenticated, Springboot stores his informations in a SecurityContextHolder, and in this code we simply extract his id (see @login-sequence-html for more).
+
+
 - Mostra le configurazioni di springboot con il codice e spiega perché servono in questa parte
-- Dai una spiegazione unica sul flusso di presentazione di una pagina, così non devi farlo ogni volta
-- Aggiungi che le eccezioni sono gestite ma non in modo user-friendly, dato che non era richiesto di gestire finemente le eccezioni ma solo di gestirle; inoltre il tempo a disposizione era poco
-- Aggiungi che ogni volta che compare userId vuol dire che è stato chiamato UserDetailsExtractor che recupera l'id dell'utente dal SecurityContext
 
 #pagebreak()
 
@@ -110,7 +166,7 @@
 
     After this operation, the AuthorizationFilter filter compares the data provided by the client and by the UserDetailsService and if they are the same, the user is redirected to the home page. Otherwise the user is redirected to the login page.
   ],
-  label_: "login-sequence",
+  label_: "login-sequence-html",
   comment_next_page_: false,
 )
 
@@ -332,6 +388,9 @@
   }),
   comment_next_page_: false,
   comment: [
+    When the user loads a track, the request is handled by a method in HomeController where the mime type of the loaded files is checked and if they are right, the track is also added to the database.
+
+    If a RuntimeException occours or if everything went fine, the user is redirected to the home page.
   ],
 )
 
@@ -364,6 +423,9 @@
   }),
   comment_next_page_: false,
   comment: [
+    When the user loads a playlist, the request is handled by a method in HomeController which uses trackDAO adn playlistTracksDAO to store the data from playlistForm.
+
+    If a RuntimeException occours or if everything went fine, the user is redirected to the home page.
   ],
 )
 
@@ -395,6 +457,9 @@
   }),
   comment_next_page_: false,
   comment: [
+    When the user loads a playlist, the request is handled by a method in PlaylistController which uses playlistTracksDAO to store the new tracks added in the playlist.
+
+    If a RuntimeException occours or if everything went fine, the user is redirected to the home page.
   ],
 )
 
@@ -413,6 +478,10 @@
       {
         _seq("C", "A", comment: [return ResponseEntity.ok() \ .contentType(MediaType.APPLICATION_OCTET_STREAM) \ .body(file)])
       },
+      "file not owned by user",
+      {
+        _seq("C", "A", comment: [return ResponseEntity\ .status(HttpStatus.FORBIDDEN)\ .build();])
+      },
       "!File.exists()",
       {
         _seq("C", "A", comment: [return ResponseEntity.\ notFound() \.build()])
@@ -426,10 +495,175 @@
   }),
   comment_next_page_: false,
   comment: [
+    When the user wants to request a file he calls this method which handles the request and if every check is passed, the file is returned.
   ],
 )
 
 = Sequence diagrams RIA
+
+== Disclaimer
+
+Without the integration of thymeleaf with Springboot, changes occured in the project structure. For example the login is more manually handled (see).
+
+== SecurityContextHolder
+
+#grid(
+  columns: (auto, 1fr),
+  align: horizon + left,
+  [Represented by:],
+  guard
+)
+
+As the name suggets, this class contains the security context, which means it contains data about the currently authenticated user. And if SecurityContextHolder holder is empty the user is considered not authenticated.
+
+Note that this is the same class used to retrieve the userId inside the controllers.
+
+== Basic mappings
+
+The first 6 mappings are very basic and they all act in the same way:
++ the client creates a GET request
++ the request arrives to the correct mapping
++ the mapping obtains the requested data from a specific DAO
++ the mapping returns the obtained data to the client
+
+For this reason there won't be any comments under them.
+
+#pagebreak()
+
+#seq_diagram(
+  [GetAllNotInPlaylist sequence diagram],
+  diagram({
+
+    actors(
+      controller: "TrackController", 
+      daos: ("trackDAO",),
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_all_in_playlist/{id}])
+    _seq("B", "C", comment: [getAllInPlaylist(id)])
+    _seq("C", "F", comment: [getAllNotInPlaylist(userId, id)])
+    _seq("F", "C", comment: [tracks])
+    _seq("C", "A", comment: [tracks])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#seq_diagram(
+  [GetGenres sequence diagram],
+  diagram({
+
+    actors(
+      controller: "TrackController", 
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_genres])
+    _seq("B", "C", comment: [getGenres()])
+    _seq("C", "A", comment: [genres])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#pagebreak()
+
+#seq_diagram(
+  [GetPlaylist sequence diagram],
+  diagram({
+
+    actors(
+      controller: "PlaylistController", 
+      daos: ("playlistDAO",),
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_playlists])
+    _seq("B", "C", comment: [getPlaylists()])
+    _seq("C", "F", comment: [findByAuthorIdOrderByCreationDateAsc(userId)])
+    _seq("F", "C", comment: [playlists])
+    _seq("C", "A", comment: [playlists])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#seq_diagram(
+  [GetPlaylistSizeByid sequence diagram],
+  diagram({
+
+    actors(
+      controller: "PlaylistController", 
+      daos: ("playlistTracksDAO",),
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_playlist_size_by_id/{id}])
+    _seq("B", "C", comment: [getPlaylistSizeByid(id)])
+    _seq("C", "F", comment: [getAllByPlaylistId(id, userId)])
+    _seq("F", "C", comment: [playlists])
+    _seq("C", "A", comment: [playlists.size()])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#pagebreak()
+
+#seq_diagram(
+  [GetTrackById sequence diagram],
+  diagram({
+
+    actors(
+      controller: "TrackController", 
+      daos: ("trackDAO",),
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_track_by_id/{id}])
+    _seq("B", "C", comment: [getTrackById(id)])
+    _seq("C", "F", comment: [findTrackByIdAndLoaderId(id, userId)])
+    _seq("F", "C", comment: [track])
+    _seq("C", "A", comment: [track])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#seq_diagram(
+  [GetTracks sequence diagram],
+  diagram({
+
+    actors(
+      controller: "TrackController", 
+      daos: ("trackDAO",),
+      full: false
+    )
+
+    _seq("A", "B", comment: [GET \ /get_tracks])
+    _seq("B", "C", comment: [getTracks()])
+    _seq("C", "F", comment: [getAllByUserIdSorted(userId)])
+    _seq("F", "C", comment: [tracks])
+    _seq("C", "A", comment: [tracks])
+
+  }),
+  add_comment: false,
+  next_page: false,
+  comment_next_page_: false,
+)
+
+#pagebreak()
 
 #seq_diagram(
   "Login sequence diagram",
@@ -473,8 +707,17 @@
 
   }),
   comment: [
+    Like in the html version the user sends a post request to the /login mapping: this time its implementation is handled more manually.
+
+    From the username and password received from the request, a token is generated.
+
+    The token is then verified by the SecurityContextHolder which calls loadUserByUsername() implemented by the same UserDetailsService from the HTML version.
+
+    SecurityContextHolder return an Authentication object holding the results of the validation of the credentials.
+
+    The next chain of calls is basically boilerplate to finally store a valid context with the authentication, inside SecurityContextRepository. This way the authentication is effectively stored.
   ],
-  label_: "login-sequence",
+  label_: "login-sequence-ria",
   comment_next_page_: false,
 )
 
@@ -485,11 +728,10 @@
     actors(full: false)
 
     _seq("A", "B", comment: [POST\ /logout])
-    _seq("B", "B", comment: [":redirect/logout"])
 
   }),
   comment: [
-    In order to perform a logout, Springboot requires the client to call the POST /logout mapping which internally invalidates session and all the other data associated to the user (of course the data inside the DB are preserved), and then the user is redirected to the login page.
+    In order to perform a logout, Springboot requires the client to call the POST /logout mapping which internally invalidates session and all the other data associated to the user (of course the data inside the DB are preserved).
   ],
   comment_next_page_: false,
 )
@@ -522,55 +764,7 @@
 
   }),
   comment: [
-    After requesting the page with GET /subscribe, the user can fill and submit the provided form to subscribe to the site.
-
-    The call is redirected to the correct controller (SubscribeController) by the DispatcherServlet: the controller tries to save the user by calling userDAO.save() and if any kind of RuntimeException exceptio occurs (so SQLExceptions are also considered), the user is redirected to the subscribe page. Otherwise the user is redirected to the login page.
-
-    In this situation an SQLExceptions exception might occour also because in the DB there is already a user with the same username.
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetPlaylist sequence diagram],
-  diagram({
-
-    actors(
-      controller: "PlaylistController", 
-      daos: ("playlistDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_playlists])
-    _seq("B", "C", comment: [getPlaylists()])
-    _seq("C", "F", comment: [findByAuthorIdOrderByCreationDateAsc(userId)])
-    _seq("F", "C", comment: [playlists])
-    _seq("C", "A", comment: [playlists])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetPlaylistSizeByid sequence diagram],
-  diagram({
-
-    actors(
-      controller: "PlaylistController", 
-      daos: ("playlistTracksDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_playlist_size_by_id/{id}])
-    _seq("B", "C", comment: [getPlaylistSizeByid(id)])
-    _seq("C", "F", comment: [getAllByPlaylistId(id, userId)])
-    _seq("F", "C", comment: [playlists])
-    _seq("C", "A", comment: [playlists.size()])
-
-  }),
-  comment: [
+    The client request is redirected to the correct controller (AuthController) by the DispatcherServlet: the controller tries to save the user by calling userDAO.save() and if any kind of RuntimeException exceptio occurs (so SQLExceptions are also considered), a response is sent back with a 200 status. Otherwise the a response is sent back with a 500 status.
   ],
   comment_next_page_: false,
 )
@@ -625,135 +819,6 @@
 
     _seq("A", "B", comment: [POST \ /set_custom_order])
     _seq("B", "C", comment: [addTracksToPlaylist(playlistId, selectedTracks)])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [getTrackById sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      daos: ("trackDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_track_by_id/{id}])
-    _seq("B", "C", comment: [getTrackById(id)])
-    _seq("C", "F", comment: [findTrackByIdAndLoaderId(id, userId)])
-    _seq("F", "C", comment: [track])
-    _seq("C", "A", comment: [track])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetTrackById sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      daos: ("trackDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_tracks])
-    _seq("B", "C", comment: [getTracks()])
-    _seq("C", "F", comment: [getAllByUserIdSorted(userId)])
-    _seq("F", "C", comment: [tracks])
-    _seq("C", "A", comment: [tracks])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetTracks sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      daos: ("trackDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_tracks])
-    _seq("B", "C", comment: [getTracks()])
-    _seq("C", "F", comment: [getAllByUserIdSorted(userId)])
-    _seq("F", "C", comment: [tracks])
-    _seq("C", "A", comment: [tracks])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetAllNotInPlaylist sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      daos: ("trackDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_all_not_in_playlist/{id}])
-    _seq("B", "C", comment: [getTracks(id)])
-    _seq("C", "F", comment: [getAllNotInPlaylist(userId, id)])
-    _seq("F", "C", comment: [tracks])
-    _seq("C", "A", comment: [tracks])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetAllNotInPlaylist sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      daos: ("trackDAO",),
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_all_in_playlist/{id}])
-    _seq("B", "C", comment: [getAllInPlaylist(id)])
-    _seq("C", "F", comment: [getAllNotInPlaylist(userId, id)])
-    _seq("F", "C", comment: [tracks])
-    _seq("C", "A", comment: [tracks])
-
-  }),
-  comment: [
-  ],
-  comment_next_page_: false,
-)
-
-#seq_diagram(
-  [GetGenres sequence diagram],
-  diagram({
-
-    actors(
-      controller: "TrackController", 
-      full: false
-    )
-
-    _seq("A", "B", comment: [GET \ /get_genres])
-    _seq("B", "C", comment: [getGenres()])
-    _seq("C", "A", comment: [genres])
 
   }),
   comment: [
