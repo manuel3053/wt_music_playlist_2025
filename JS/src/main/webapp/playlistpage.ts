@@ -88,6 +88,7 @@ export class PlaylistPage implements Component {
 
   private getTracksInCarousel(index: number): void {
     this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+
       const carousel = document.getElementById("carousel")!
       carousel.innerHTML = ""
       const placeholder: HTMLDivElement = document.createElement("div")

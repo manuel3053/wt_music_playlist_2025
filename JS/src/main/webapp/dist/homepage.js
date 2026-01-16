@@ -175,6 +175,10 @@ export class HomePage {
         const trackForm = document.getElementById("load-track");
         trackForm.addEventListener('submit', (event) => {
             event.preventDefault();
+            if (!trackForm.checkValidity()) {
+                alert("The form is not compiled correctly");
+                return;
+            }
             const formData = new FormData(trackForm);
             trackForm.reset();
             this._trackRepository.createTrack(formData)
@@ -184,6 +188,10 @@ export class HomePage {
         const playlistForm = document.getElementById("load-playlist");
         playlistForm.addEventListener('submit', (event) => {
             event.preventDefault();
+            if (!playlistForm.checkValidity()) {
+                alert("The form is not compiled correctly");
+                return;
+            }
             const formData = new FormData(playlistForm);
             playlistForm.reset();
             this._playlistRepository.createPlaylist(formData)

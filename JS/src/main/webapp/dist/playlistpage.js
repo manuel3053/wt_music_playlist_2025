@@ -78,6 +78,7 @@ export class PlaylistPage {
     }
     getTracksInCarousel(index) {
         this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+            console.log(tracks);
             const carousel = document.getElementById("carousel");
             carousel.innerHTML = "";
             const placeholder = document.createElement("div");
@@ -123,6 +124,10 @@ export class PlaylistPage {
         const playlistForm = document.getElementById("load-tracks");
         playlistForm.addEventListener('submit', (event) => {
             event.preventDefault();
+            if (!playlistForm.checkValidity()) {
+                alert("The form is not compiled correctly");
+                return;
+            }
             const formData = new FormData(playlistForm);
             formData.append("playlist_id", this.playlistId.toString());
             playlistForm.reset();

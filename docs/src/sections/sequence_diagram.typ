@@ -126,9 +126,6 @@ public static int getUserId() {
 
 When a user is authenticated, Springboot stores his informations in a SecurityContextHolder, and in this code we simply extract his id (see @login-sequence-html for more).
 
-
-- Mostra le configurazioni di springboot con il codice e spiega perché servono in questa parte
-
 #pagebreak()
 
 #seq_diagram(
@@ -435,16 +432,28 @@ When a user is authenticated, Springboot stores his informations in a SecurityCo
 
     sequence(
       type: "POST playlistForm",
-      mapping: "playlist/add_track_to_playlist",
+      mapping: [playlist\ /add_track_to_playlist],
       method: "addTrackToPlaylist (playlistForm)",
       view: "playlist/playlist_id/0",
       controller: "PlaylistController",
-      daos: ("playlistTracksDAO",),
+      daos: ("trackDAO", "playlistTracksDAO",),
       extra: (
         _alt(
           "try",
           {
-            _seq("C", "F", comment: [saveAll(\ playlistForm.toPlaylistTracks()\ )])
+            _seq("C", "F", comment: [getAllByUserIdSorted(\ userId\ )])
+            _seq("F", "C", comment: [tracks])
+            _alt(
+              "",
+              {
+                _seq("C", "C", comment: [check if tracks \ from the form \ are owned by the user])
+              },
+              "tracks not owned by the user",
+              {
+                _seq("C", "B", comment: ["redirect:/home"])
+              }
+            )
+            _seq("C", "G", comment: [saveAll(\ playlistForm.toPlaylistTracks()\ )])
           },
           "catch Exception",
           {
@@ -694,17 +703,6 @@ For this reason there won't be any comments under them.
     _seq("C", "C", comment: [context\ .setAuthentication(context)])
     _seq("C", "C", comment: [SecurityContextHolder\ .setContext(context)])
     _seq("C", "C", comment: [SecurityContextRepository\ .saveContext(context, res req)])
-    _alt(
-      "succesful comparison",
-      {
-        _seq("C", "B", comment: [":redirect/home"])
-      },
-      "Failed comparison",
-      {
-        _seq("C", "B", comment: [":redirect/login"])
-      },
-    )
-
   }),
   comment: [
     Like in the html version the user sends a post request to the /login mapping: this time its implementation is handled more manually.
@@ -718,7 +716,7 @@ For this reason there won't be any comments under them.
     The next chain of calls is basically boilerplate to finally store a valid context with the authentication, inside SecurityContextRepository. This way the authentication is effectively stored.
   ],
   label_: "login-sequence-ria",
-  comment_next_page_: false,
+  comment_next_page_: true,
 )
 
 
@@ -775,15 +773,42 @@ For this reason there won't be any comments under them.
 
     actors(
       controller: "PlaylistController", 
-      daos: ("trackDAO", "playlistDAO", "playlistTracksDAO",),
+      daos: ("playlistDAO", "playlistTracksDAO", "trackDAO"),
       full: false
     )
 
     _seq("A", "B", comment: [POST \ /add_playlist])
     _seq("B", "C", comment: [addPlaylist(title, selectedTracks)])
+    _alt(
+      "try",
+      {
+        _seq("C", "H", comment: [getAllByUserIdSorted(userId)])
+        _seq("H", "C", comment: [userTracks])
+        _alt(
+          "",
+          {
+            _seq("C", "F", comment: [save(playlist)])
+            _seq("C", "G", comment: [saveAll(playlistTracks)])
+          },
+          "tracks not owned by the user",
+          {
+            _seq("C", "A", comment: [403])
+          },
+        )
+      },
+      "catch RuntimeException",
+      {
+        _seq("C", "A", comment: [500])
+      }
+    )
 
   }),
   comment: [
+    When the user loads a playlist, the request is handled by a method in PlaylistController which uses trackDAO, playlistDAO and playlistTracksDAO to store the data received.
+
+    It also checks if the user owns the ids of the tracks contained in selectedTracks. If at least one of them is not owned by the user, the request is rejected.
+
+    If a RuntimeException occours or if everything went fine, the user is redirected to the home page.
   ],
   comment_next_page_: false,
 )
@@ -794,12 +819,55 @@ For this reason there won't be any comments under them.
 
     actors(
       controller: "PlaylistController", 
-      daos: ("trackDAO", "playlistDAO", "playlistTracksDAO",),
+      daos: ("playlistTracksDAO", "trackDAO", "playlistDAO"),
       full: false
     )
 
     _seq("A", "B", comment: [POST \ /add_tracks_to_playlist])
-    _seq("B", "C", comment: [addTracksToPlaylist(playlistId, selectedTracks)])
+    _seq("B", "C", comment: [addTracksToPlaylist(\ playlistId, selectedTracks\ )])
+    _alt(
+      "",
+      {
+        _seq("C", "H", comment: [findByAuthorIdAndId(userId, playlistId)])
+        _seq("H", "C", comment: [playlist])
+        _alt(
+          "",
+          {
+            _seq("C", "G", comment: [getAllByUserIdSorted(userId)])
+            _seq("G", "C", comment: [tracks])
+            _alt(
+              "playlist with custom order",
+              {
+                _seq("C", "G", comment: [getAllInPlaylist(userId, playlistId)])
+                _seq("G", "C", comment: [tracks.size() - 1])
+              },
+              "playlist with normal order",
+              {
+                // _seq("C", "A", comment: [403])
+              },
+            )
+            _alt(
+              "try",
+              {
+                _seq("C", "F", comment: [saveAll(playlistTracks)])
+              },
+              "catch",
+              {
+                _seq("C", "A", comment: [500])
+              },
+            )
+          },
+          "selectedTracks are not owned by the user",
+          {
+            _seq("C", "A", comment: [403])
+          },
+        )
+      },
+      "playlist doesn't exists",
+      {
+        _seq("C", "A", comment: [403])
+      },
+    )
 
   }),
   comment: [
@@ -818,7 +886,29 @@ For this reason there won't be any comments under them.
     )
 
     _seq("A", "B", comment: [POST \ /set_custom_order])
-    _seq("B", "C", comment: [addTracksToPlaylist(playlistId, selectedTracks)])
+    _seq("B", "C", comment: [setCustomOrder(\ playlistId, tracks\ )])
+    _alt(
+      "try",
+      {
+        _seq("C", "G", comment: [findByAuthorIdAndId(userId, playlistId)])
+        _seq("G", "C", comment: [playlist])
+        _alt(
+          "",
+          {
+            _seq("C", "F", comment: [save(playlist)])
+            _seq("C", "G", comment: [saveAll(playlistTracks)])
+          },
+          "tracks not owned by the user",
+          {
+            _seq("C", "A", comment: [403])
+          },
+        )
+      },
+      "catch RuntimeException",
+      {
+        _seq("C", "A", comment: [500])
+      }
+    )
 
   }),
   comment: [
@@ -832,14 +922,30 @@ For this reason there won't be any comments under them.
 
     actors(
       controller: "TrackController", 
+      daos: ("trackDAO", "Storage"),
       full: false
     )
 
     _seq("A", "B", comment: [POST \ /add_track])
     _seq("B", "C", comment: [addTrack()])
+        _alt(
+          "try",
+          {
+            _seq("C", "G", comment: [Files.copy(audio)])
+            _seq("C", "G", comment: [Files.copy(cover)])
+            _seq("C", "F", comment: [save(trackForm.toTrack())])
+          },
+          "catch Exception",
+          {
+            _seq("C", "A", comment: [500])
+          },
+        )
 
   }),
   comment: [
+    When the user loads a track, the request is handled by a method in TrackController where the mime type of the loaded files is checked and if they are right, the track is also added to the database.
+
+    If a RuntimeException occours the server throws an error to the client.
   ],
   comment_next_page_: false,
 )
