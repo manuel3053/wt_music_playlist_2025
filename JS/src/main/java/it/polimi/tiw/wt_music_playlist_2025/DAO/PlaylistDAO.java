@@ -12,15 +12,16 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 @Repository
 @Transactional
 public interface PlaylistDAO extends JpaRepository<Playlist, Integer> {
-    List<Playlist> findByAuthorIdOrderByCreationDateAsc(int authorId);
-    Playlist findByAuthorIdAndId(int authorId, int id);
-    Playlist save(Playlist playlist);
-    @NativeQuery(
-            value = """
-                    update playlist
-                    set custom_order = true
-                    where id = ?1
-                    """
-    )
-    void setCustomOrder(int id);
+  List<Playlist> findByAuthorIdOrderByCreationDateDesc(int authorId);
+
+  Playlist findByAuthorIdAndId(int authorId, int id);
+
+  Playlist save(Playlist playlist);
+
+  @NativeQuery(value = """
+      update playlist
+      set custom_order = true
+      where id = ?1
+      """)
+  void setCustomOrder(int id);
 }

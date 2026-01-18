@@ -130,7 +130,7 @@ The views are represented by the following classes:
 - HomePage: the user can load a track, create a playlist, open a playlist or open the modal to sort the playlist
 - PlaylistPage: the user can add tracks to the playlist or open a track
 - TrackPage: the user can see data about the track and listen to it
-- Header: contains the logout and go to previous page button
+- Header: contains the logout and go to previous page buttons
 - Modal: shows the tracks in the playlist and the user can sort them
 
 The views are backed by two html files:
@@ -316,12 +316,12 @@ The possible actions are described in the following tables.
 Instead of manually creating filters to block mappings to an anauthenticated user, it's possible to use the system of filters provided by Springboot.
 
 The version for the *HTML* subproject is the simplest (see @security-html):
-- the requests that can always be accessed are /login and /subscribe (also the stylesheet are always available)
+- the requests that can always be accessed are /login and /subscribe (also the stylesheets are always available)
 - all the other requests requires the user to be authenticated
 - the login can be performed by making a POST request to /login and if successful, the user is redirected to /home
 - the logout can be performed by making a POST request to /logout
 
-The version for the *RIA* subproject (see @security-ria) is more complex because the login process is handled diferrently (because there isn't thymeleaf to help):
+The version for the *RIA* subproject (see @security-ria) is more complex because the login process is handled differently (because there isn't thymeleaf to help):
 - the requests that can always be accessed are /login and /subscribe
 - also the resources folder containing the scripts and the html files using those scripts, are always available
 - all the other requests requires the user to be authenticated

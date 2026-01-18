@@ -11,7 +11,7 @@ import it.polimi.tiw.wt_music_playlist_2025.entity.Playlist;
 @Repository
 @Transactional
 public interface PlaylistDAO extends JpaRepository<Playlist, Integer> {
-    List<Playlist> findByAuthorIdOrderByCreationDateAsc(int authorId);
+  List<Playlist> findByAuthorIdOrderByCreationDateDesc(int authorId);
 
-    Playlist save(Playlist playlist);
+  Playlist save(Playlist playlist);
 }

@@ -4,7 +4,7 @@
 
 == Overview
 
-The project requirements slightly change from `pure_html` and `js`, where the latter requires the playlist to support custom ordering the tracks -- this is achieved by adding an optional position column in `track` and a custom order flag in `playlist`
+The project requirements slightly change from `pure_html` and `js`, where the latter requires the playlist to support custom ordering the tracks -- this is achieved by adding an optional position column in `playlist_tracks` and a custom order flag in `playlist`
 
 In both scenarios, the schema is the same.
 
@@ -23,7 +23,7 @@ CREATE TABLE user
     UNIQUE KEY `username` (`username`),
 );
 ```
-it is quite staightforward and standard. Apart from the `id` attribute, which is the primary key, the only other attribute that has a unique constraint is `username`.
+it is quite straightforward and standard. Apart from the `id` attribute, which is the primary key, the only other attribute that has a unique constraint is `username`.
 
 ```sql
 CREATE TABLE track
@@ -47,7 +47,7 @@ CREATE TABLE track
 );
 ```
 
-the unique constraint on `loader_id, title, author, album_title, album_publication_year` is to make sure that the user doesn't load duplicates (there are almost all the attributes inside it to address the unlikely situation where an almost identical track is loaded).
+The unique constraint on `loader_id, title, author, album_title, album_publication_year` is to make sure that the user doesn't load duplicates (there are almost all the attributes inside it to address the unlikely situation where an almost identical track is loaded).
 
 The `loader_id` foreign key references the `id` of the user and if it is removed, his tracks are also removed.
 
@@ -68,7 +68,7 @@ CREATE TABLE playlist
 );
 ```
 
-The `creatione_date` attribute defaults to the today's date; and there is also the unique constraint on `title, author_id` because a playlist is bound to a single user (who can't have duplicate playlists -- that is with the same title) via the foreign key.
+The `creatione_date` attribute defaults to today's date; and there is also the unique constraint on `title, author_id` because a playlist is bound to a single user (who can't have duplicate playlists) via the foreign key.
 
 
 ```sql

@@ -89,7 +89,7 @@ public class PlaylistController {
         int userId = UserDetailsExtractor.getUserId();
         Playlist playlist = playlistDAO.findByAuthorIdAndId(userId, playlistId);
         if (playlist == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         List<Integer> userTracks = trackDAO.getAllByUserIdSorted(userId).stream()
@@ -142,7 +142,7 @@ public class PlaylistController {
 
         Playlist playlist = playlistDAO.findByAuthorIdAndId(UserDetailsExtractor.getUserId(), playlistId);
         if (playlist == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         int userId = UserDetailsExtractor.getUserId();
@@ -161,7 +161,7 @@ public class PlaylistController {
                 playlistTracksDAO.updatePosition(i, tracks.get(i), playlistId);
             }
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
