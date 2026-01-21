@@ -4,6 +4,7 @@ export class PlaylistPage {
     constructor(context, playlistId) {
         this._trackRepository = new TrackRepository();
         this._playlistRepository = new PlaylistRepository();
+        this._tracks = [];
         this.context = context;
         this.playlistId = playlistId;
     }
@@ -76,50 +77,51 @@ export class PlaylistPage {
             });
         });
     }
-    getTracksInCarousel(index) {
-        this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
-            const carousel = document.getElementById("carousel");
-            carousel.innerHTML = "";
-            const placeholder = document.createElement("div");
-            if (index > 0) {
-                const prev = document.createElement("button");
-                prev.className = "link-button";
-                prev.textContent = "Prev";
-                prev.addEventListener("click", () => this.getTracksInCarousel.bind(this)(index - 1));
-                carousel.append(prev);
-            }
-            else {
-                carousel.append(placeholder);
-            }
-            tracks.slice(index * 5, index * 5 + 5).forEach(t => {
-                const cell = document.createElement("div");
-                cell.className = "carousel-cell";
-                const cover = document.createElement("img");
-                cover.className = "track-cover";
-                cover.src = `/file/${t.imagePath}`;
-                const title = document.createElement("button");
-                title.className = "link-button";
-                title.textContent = t.title.toString();
-                title.addEventListener("click", () => this.context.currentPage = new TrackPage(this.context, t.id));
-                cell.append(cover);
-                cell.append(title);
-                carousel.append(cell);
-            });
-            if (tracks.length > 5 && (index + 1) * 5 < tracks.length) {
-                const next = document.createElement("button");
-                next.className = "link-button";
-                next.textContent = "Next";
-                next.addEventListener("click", () => this.getTracksInCarousel.bind(this)(index + 1));
-                carousel.append(next);
-            }
-            else {
-                carousel.append(placeholder);
-            }
+    scrollCarousel(index) {
+        const carousel = document.getElementById("carousel");
+        carousel.innerHTML = "";
+        const placeholder = document.createElement("div");
+        if (index > 0) {
+            const prev = document.createElement("button");
+            prev.className = "link-button";
+            prev.textContent = "Prev";
+            prev.addEventListener("click", () => this.scrollCarousel.bind(this)(index - 1));
+            carousel.append(prev);
+        }
+        else {
+            carousel.append(placeholder);
+        }
+        this._tracks.slice(index * 5, index * 5 + 5).forEach(t => {
+            const cell = document.createElement("div");
+            cell.className = "carousel-cell";
+            const cover = document.createElement("img");
+            cover.className = "track-cover";
+            cover.src = `/file/${t.imagePath}`;
+            const title = document.createElement("button");
+            title.className = "link-button";
+            title.textContent = t.title.toString();
+            title.addEventListener("click", () => this.context.currentPage = new TrackPage(this.context, t.id));
+            cell.append(cover);
+            cell.append(title);
+            carousel.append(cell);
         });
+        if (this._tracks.length > 5 && (index + 1) * 5 < this._tracks.length) {
+            const next = document.createElement("button");
+            next.className = "link-button";
+            next.textContent = "Next";
+            next.addEventListener("click", () => this.scrollCarousel.bind(this)(index + 1));
+            carousel.append(next);
+        }
+        else {
+            carousel.append(placeholder);
+        }
     }
     build() {
+        this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+            this._tracks = tracks;
+            this.scrollCarousel(0);
+        });
         this.getTracksNotInPlaylist();
-        this.getTracksInCarousel(0);
         const playlistForm = document.getElementById("load-tracks");
         playlistForm.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -133,7 +135,10 @@ export class PlaylistPage {
             this._playlistRepository.addTracksToPlaylist(formData)
                 .then(() => {
                 this.getTracksNotInPlaylist.bind(this)();
-                this.getTracksInCarousel.bind(this)(0);
+                this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+                    this._tracks = tracks;
+                    this.scrollCarousel(0);
+                });
             })
                 .catch(() => alert("Failed to load playlist"));
         });

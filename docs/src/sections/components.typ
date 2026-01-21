@@ -352,7 +352,7 @@ Since the login process is more complex, it also requires to use an Authenticati
                     )
                     .formLogin(httpForm -> httpForm
                             .loginPage("/login")
-                            .defaultSuccessUrl("/home")
+                            .defaultSuccessUrl("/home", true)
                             .permitAll()
                     )
                     .logout(logout -> logout.permitAll());

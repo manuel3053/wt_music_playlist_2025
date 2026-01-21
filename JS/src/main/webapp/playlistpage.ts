@@ -1,6 +1,7 @@
 import { PlaylistRepository, TrackRepository } from "./api.service.js"
 import { App } from "./app.js"
 import { Component } from "./component.js"
+import { Track } from "./model/track.js"
 import { TrackPage } from "./trackpage.js"
 
 export class PlaylistPage implements Component {
@@ -8,6 +9,7 @@ export class PlaylistPage implements Component {
   private playlistId: number
   private _trackRepository = new TrackRepository()
   private _playlistRepository = new PlaylistRepository()
+  private _tracks: Track[] = [];
 
   constructor(context: App, playlistId: number) {
     this.context = context
@@ -86,63 +88,63 @@ export class PlaylistPage implements Component {
     })
   }
 
-  private getTracksInCarousel(index: number): void {
-    this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+  private scrollCarousel(index: number): void {
+    const carousel = document.getElementById("carousel")!
+    carousel.innerHTML = ""
+    const placeholder: HTMLDivElement = document.createElement("div")
 
-      const carousel = document.getElementById("carousel")!
-      carousel.innerHTML = ""
-      const placeholder: HTMLDivElement = document.createElement("div")
+    if (index > 0) {
+      const prev: HTMLButtonElement = document.createElement("button")
+      prev.className = "link-button"
+      prev.textContent = "Prev"
+      prev.addEventListener(
+        "click",
+        () => this.scrollCarousel.bind(this)(index - 1)
+      )
+      carousel.append(prev)
+    } else {
+      carousel.append(placeholder)
+    }
 
-      if (index > 0) {
-        const prev: HTMLButtonElement = document.createElement("button")
-        prev.className = "link-button"
-        prev.textContent = "Prev"
-        prev.addEventListener(
-          "click",
-          () => this.getTracksInCarousel.bind(this)(index - 1)
-        )
-        carousel.append(prev)
-      } else {
-        carousel.append(placeholder)
-      }
-
-      tracks.slice(index * 5, index * 5 + 5).forEach(t => {
-        const cell: HTMLDivElement = document.createElement("div")
-        cell.className = "carousel-cell"
-        const cover: HTMLImageElement = document.createElement("img")
-        cover.className = "track-cover"
-        cover.src = `/file/${t.imagePath}`
-        const title: HTMLButtonElement = document.createElement("button")
-        title.className = "link-button"
-        title.textContent = t.title.toString()
-        title.addEventListener(
-          "click",
-          () => this.context.currentPage = new TrackPage(this.context, t.id)
-        )
-        cell.append(cover)
-        cell.append(title)
-        carousel.append(cell)
-      })
-
-      if (tracks.length > 5 && (index + 1) * 5 < tracks.length) {
-        const next: HTMLButtonElement = document.createElement("button")
-        next.className = "link-button"
-        next.textContent = "Next"
-        next.addEventListener(
-          "click",
-          () => this.getTracksInCarousel.bind(this)(index + 1)
-        )
-        carousel.append(next)
-      } else {
-        carousel.append(placeholder)
-      }
-
+    this._tracks.slice(index * 5, index * 5 + 5).forEach(t => {
+      const cell: HTMLDivElement = document.createElement("div")
+      cell.className = "carousel-cell"
+      const cover: HTMLImageElement = document.createElement("img")
+      cover.className = "track-cover"
+      cover.src = `/file/${t.imagePath}`
+      const title: HTMLButtonElement = document.createElement("button")
+      title.className = "link-button"
+      title.textContent = t.title.toString()
+      title.addEventListener(
+        "click",
+        () => this.context.currentPage = new TrackPage(this.context, t.id)
+      )
+      cell.append(cover)
+      cell.append(title)
+      carousel.append(cell)
     })
+
+    if (this._tracks.length > 5 && (index + 1) * 5 < this._tracks.length) {
+      const next: HTMLButtonElement = document.createElement("button")
+      next.className = "link-button"
+      next.textContent = "Next"
+      next.addEventListener(
+        "click",
+        () => this.scrollCarousel.bind(this)(index + 1)
+      )
+      carousel.append(next)
+    } else {
+      carousel.append(placeholder)
+    }
+
   }
 
   build(): void {
+    this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+      this._tracks = tracks
+      this.scrollCarousel(0)
+    })
     this.getTracksNotInPlaylist()
-    this.getTracksInCarousel(0)
 
     const playlistForm = document.getElementById("load-tracks") as HTMLFormElement
     playlistForm.addEventListener('submit', (event) => {
@@ -157,7 +159,10 @@ export class PlaylistPage implements Component {
       this._playlistRepository.addTracksToPlaylist(formData)
         .then(() => {
           this.getTracksNotInPlaylist.bind(this)()
-          this.getTracksInCarousel.bind(this)(0)
+          this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
+            this._tracks = tracks
+            this.scrollCarousel(0)
+          })
         })
         .catch(() => alert("Failed to load playlist"))
     });
