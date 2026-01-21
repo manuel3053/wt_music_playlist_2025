@@ -20,6 +20,9 @@ public class FileController {
     @GetMapping("/file/{user_id}/{playlist_name}/{cover_name}")
     public ResponseEntity<UrlResource> serveSafeFile(@PathVariable("user_id") String userId,
             @PathVariable("playlist_name") String playlistName, @PathVariable("cover_name") String coverName) {
+            System.out.println(userId);
+            System.out.println(playlistName);
+            System.out.println(coverName);
         if (UserDetailsExtractor.getUserId() != Integer.parseInt(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

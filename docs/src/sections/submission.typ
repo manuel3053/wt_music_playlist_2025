@@ -182,8 +182,12 @@ The user can #user_action[drag] the title of a track and #user_action[drop] it i
 
 == Added features
 
-- Logout function (@logout-sequence)
-- Subscribe function (@subscribe-sequence)
+- Logout function:
+  - HTML: @logout-sequence-html
+  - RIA: @logout-sequence-ria
+- Subscribe function:
+  - HTML: @subscribe-sequence-html  
+  - RIA: @subscribe-sequence-ria
 
 // #colbreak()
 

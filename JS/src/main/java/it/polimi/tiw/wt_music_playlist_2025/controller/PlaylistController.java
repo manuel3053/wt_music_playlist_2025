@@ -41,7 +41,7 @@ public class PlaylistController {
 
     @GetMapping("/get_playlists")
     public List<Playlist> getPlaylists() {
-        return playlistDAO.findByAuthorIdOrderByCreationDateAsc(UserDetailsExtractor.getUserId());
+        return playlistDAO.findByAuthorIdOrderByCreationDateDesc(UserDetailsExtractor.getUserId());
     }
 
     @GetMapping("/get_playlist_size_by_id/{id}")

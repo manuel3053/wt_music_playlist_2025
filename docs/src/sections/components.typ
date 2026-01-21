@@ -315,13 +315,13 @@ The possible actions are described in the following tables.
 
 Instead of manually creating filters to block mappings to an anauthenticated user, it's possible to use the system of filters provided by Springboot.
 
-The version for the *HTML* subproject is the simplest (see @security-html):
+The version for the *HTML* subproject is the simplest:
 - the requests that can always be accessed are /login and /subscribe (also the stylesheets are always available)
 - all the other requests requires the user to be authenticated
 - the login can be performed by making a POST request to /login and if successful, the user is redirected to /home
 - the logout can be performed by making a POST request to /logout
 
-The version for the *RIA* subproject (see @security-ria) is more complex because the login process is handled differently (because there isn't thymeleaf to help):
+The version for the *RIA* subproject is more complex because the login process is handled differently (because there isn't thymeleaf to help):
 - the requests that can always be accessed are /login and /subscribe
 - also the resources folder containing the scripts and the html files using those scripts, are always available
 - all the other requests requires the user to be authenticated

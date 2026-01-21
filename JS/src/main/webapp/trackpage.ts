@@ -70,9 +70,6 @@ export class TrackPage implements Component {
             <div id="publication_year" class="attribute"></div>
             <div class="attribute-name">Genre: </div>
             <div id="genre" class="attribute"></div>
-            <audio controls>
-                <source id="source"/>
-            </audio>
         </div>
     </div>
     `
@@ -80,8 +77,16 @@ export class TrackPage implements Component {
 
   build(): void {
     this._trackRepository.getTrackById(this.trackId).then((track) => {
-      const source: HTMLSourceElement = document.getElementById("source")! as HTMLSourceElement
+      // const source: HTMLSourceElement = document.getElementById("s")! as HTMLSourceElement
+      // source.src = `/file/${track.filePath}`
+      const audio: HTMLAudioElement = document.createElement("audio")
+      audio.controls = true
+      const source: HTMLSourceElement = document.createElement("source")
       source.src = `/file/${track.filePath}`
+
+      audio.appendChild(source)
+      document.getElementsByClassName("track-content")[0].appendChild(audio)
+
       const cover: HTMLImageElement = document.getElementById("track-cover")! as HTMLImageElement
       cover.src = `/file/${track.imagePath}`
       document.getElementById("title")!.textContent = track.title

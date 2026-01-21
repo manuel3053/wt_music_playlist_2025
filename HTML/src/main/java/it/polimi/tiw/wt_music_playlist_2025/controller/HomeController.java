@@ -45,7 +45,7 @@ public class HomeController {
     public String showPage(Model model) {
         int userId = UserDetailsExtractor.getUserId();
         try {
-            model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateAsc(userId));
+            model.addAttribute("playlists", playlistDAO.findByAuthorIdOrderByCreationDateDesc(userId));
             tracks = trackDAO.getAllByUserIdSorted(userId);
         } catch (RuntimeException e) {
             return Route.LOGIN.go();

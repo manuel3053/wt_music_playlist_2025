@@ -180,7 +180,7 @@ When a user is authenticated, Springboot stores his information in a SecurityCon
   comment: [
     In order to perform a logout, Springboot requires the client to call the POST /logout mapping which internally invalidates session and all the other data associated to the user (of course the data inside the DB are preserved), and then the user is redirected to the login page.
   ],
-  label_: "logout-sequence",
+  label_: "logout-sequence-html",
   comment_next_page_: false,
 )
 
@@ -218,7 +218,7 @@ When a user is authenticated, Springboot stores his information in a SecurityCon
 
     In this situation an SQLException might also occur because in the DB there could be already a user with the same username.
   ],
-  label_: "subscribe-sequence",
+  label_: "subscribe-sequence-html",
   comment_next_page_: false,
 )
 
@@ -733,6 +733,7 @@ For this reason there won't be any comments under them.
     In order to perform a logout, Springboot requires the client to call the POST /logout mapping which internally invalidates session and all the other data associated to the user (of course the data inside the DB are preserved).
   ],
   comment_next_page_: false,
+  label_: "logout-sequence-ria",
 )
 
 #seq_diagram(
@@ -766,6 +767,7 @@ For this reason there won't be any comments under them.
     The client request is redirected to AuthController by DispatcherServlet: the controller tries to save the user by calling userDAO.save() and if any kind of RuntimeException exception occurs (so SQLExceptions are also considered), a response is sent back with a 200 status. Otherwise the response is sent back with a 500 status.
   ],
   comment_next_page_: false,
+  label_: "subscribe-sequence-ria",
 )
 
 #seq_diagram(

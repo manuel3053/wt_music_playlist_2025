@@ -78,7 +78,6 @@ export class PlaylistPage {
     }
     getTracksInCarousel(index) {
         this._trackRepository.getAllTracksInPlaylist(this.playlistId).then(tracks => {
-            console.log(tracks);
             const carousel = document.getElementById("carousel");
             carousel.innerHTML = "";
             const placeholder = document.createElement("div");

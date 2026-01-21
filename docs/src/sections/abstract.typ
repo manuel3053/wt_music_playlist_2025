@@ -16,7 +16,7 @@ It should be noted there are two subprojects: a (pure) *HTML version*, which is 
 
 = Credits
 
-ringrazia vittorio
+Thanks to #link("https://github.com/manuel3053/wt_music_playlist_2025")[Vittorio Robecchi] for this beautiful template.
 
 // #align(
 //   center,
